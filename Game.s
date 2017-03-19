@@ -38,15 +38,18 @@ Left:           mov     r0, BUTTON
                 bne     Jump
                 mov     r1,     #-10
                 bl      MoveMarioLR
-Jump:           mov     r0,     Button
+Jump:           mov     r0,     BUTTON
+
                 ldr     r1,     =A
                 bl      checkButton
                 cmp     r0, #1
                 bne     start
                 mov     r1,     #10
                 bl      MarioJump
-start:          mov     r0,     Button
-                ldr     r1,     START
+start:          mov     r0,     BUTTON
+                movw     r1,     #START
+
+
                 bl      checkButton     
                 cmp     r0,     #1
                 bne     GameLoop
@@ -86,10 +89,12 @@ POLoop:         add     r4,     #1
                 //Branch and link to Victor's converter        
                 //needs to provide two coordinates 
 
-                bl convertor
+ 
+                bl displayConvert
                 cmp     r0,     #-1
                 beq     POLoop
-                ldr     r4,     blank
+                ldr     r4,     =blank
+
                 mov     r0,     r6
                 mov     r1,     r7
                 mov     r2,     r8
@@ -109,9 +114,10 @@ EndPOLoop:      pop     {r4,    r10,    lr}
 //Requires Converter NOT DONE
 PrintObjects:   push    {r4,    r10, lr}
                 mov     r4,     #1
-POLoop:         add     r4,     #1
+POLoop2:         add     r4,     #1
                 cmp      r4,    #10
-                bge     EndPOLoop
+                bge     EndPOLoop2
+
                 mov     r10,     r1
                 mov     r0,     r4
                 bl      Grab
@@ -129,9 +135,10 @@ POLoop:         add     r4,     #1
                 //Branch and link to Victor's converter        
                 //needs to provide two coordinates 
 
-                bl convertor
+                bl displayConvert
                 cmp     r0,     #-1
-                beq     POLoop
+                beq     POLoop2
+ 
                 bl      GrabImage
                 mov     r4,     r0
                 mov     r0,     r6
@@ -141,7 +148,9 @@ POLoop:         add     r4,     #1
                 bl      CreateImage
                 
 
-EndPOLoop:      pop     {r4,    r10,    lr}
+EndPOLoop2:      pop     {r4,    r10,    lr}
+
+
                 bx      lr    
         
 
@@ -164,7 +173,8 @@ MarioPrint:    push    {r4,    r10, lr}
                 //Branch and link to Victor's converter        
                 //needs to provide two coordinates 
 
-                bl convertor
+                bl displayConvert
+
 	        mov     r4,     r10
 	        bl	CreateImage
                 
@@ -185,11 +195,12 @@ EraseMario:     push    {r2,    r10, lr}
                 //Branch and link to Victor's converter        
                 //needs to provide two coordinates 
 
-                bl convertor
+                bl displayConvert
 	        ldr     r4,     =blank
 	        bl	CreateImage
                 
-EndMarioPrint:  pop     {r2,    r10, lr}
+EndMarioErase:  pop     {r2,    r10, lr}
+               
                 bx      lr
 //===================================================
 Wait:
@@ -237,7 +248,11 @@ MoveMarioLR:
                 b       EndMoveMario
                 
 
-nocol1          
+ 
+nocol1:        
+=======
+
+ 
                 mov     r0,     #0b00001
                 mov     r4,     r1              //put the direction value in a safe place
                 mov     r8,     r2              //put the jump state in a safe place
@@ -256,11 +271,15 @@ nocol1
                 add     r3,     r3,     r4
                 str     r3,     [r5],   #8
                 cmp     r4,     #0
-                b.lt    WalkLeft
+ 
+                blt    WalkLeft
                 ldr     r1,     =MarioWalkRImg
                 b       MoveMario2
 WalkLeft:       ldr     r1,     =MarioWalkLImg
-MoveMario2      bl      MarioPrint
+MoveMario2:      bl      MarioPrint
+
+
+ 
 
                 bl      EraseMario
                 mov     r0,     #0b00000
@@ -306,12 +325,15 @@ nocol2:         mov     r0,     #0b00001
                 str     r3,     [r5],   #8
 EndMoveMarioLR:
                 cmp     r4,     #0
-                b.lt    WalkLeft
+ 
+                blt    WalkLeft2
                 ldr     r1,     =MarioStandRImg
                 b       MoveMario2
-WalkLeft:       ldr     r1,     =MariStandLImg
-MoveMario2      bl      MarioPrint
-EndMoveMarioLR:
+WalkLeft2:       ldr     r1,     =MariStandLImg
+MoveMario:      bl      MarioPrint
+EndMoveMarioLR2:
+
+
                 pop     {r4,    r10,    lr}
                 bx      lr
 //===================================================
