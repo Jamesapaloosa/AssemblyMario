@@ -1,15 +1,20 @@
 //This details the locations of different objects in the game
+.globl Grab
+.globl Screen_loc
+.globl init_Objects
+.globl GrabImage
+
 
 //Initialize Mario and Goomba to gamestart locations
 init_Objects:   push    {r0 - r10}
                 ldr     r0,     =Mario_loc
                 mov     r1,     #0
                 str     r1,     [r0], #4
-                mov     r1,     #618
+                movw     r1,     #618
                 str     r1,     [r0], #4
                 mov     r1,     #50
                 str     r1,     [r0], #4
-                mov     r1,     #618
+                movw     r1,     #618
                 str     r1,     [r0], #4
                 mov     r1,     #0
                 str     r1,     [r0], #4
@@ -22,7 +27,7 @@ init_Objects:   push    {r0 - r10}
 
                 //Initialize goomba
                 ldr     r0,     =Goomba_loc
-                mov     r1,     #2622
+                movw     r1,     #2622
                 str     r1,     [r0], #4
                 mov     r1,     #668
                 str     r1,     [r0], #4
@@ -30,13 +35,14 @@ init_Objects:   push    {r0 - r10}
                 str     r1,     [r0], #4
                 mov     r1,     #668
                 str     r1,     [r0], #4
-                mov     r1,     #2622
+                movw     r1,     #2622
                 str     r1,     [r0], #4
-                mov     r1,     #718
+                movw     r1,     #718
                 str     r1,     [r0], #4
                 mov     r1,     #2672
                 str     r1,     [r0], #4
-                mov     r1,     #718
+                movw     r1,     #718
+            
                 str     r1,     [r0], #4
 
                 //Initialize Screen
@@ -131,11 +137,12 @@ GrabImage:      push    {r2 - r10}
                 beq     endGrab
                 mov     r0,     #-1
 
-endGrab:        pop     {r2 - r10}
+endGrabImage:        pop     {r2 - r10}
                 bx      lr
 
 
-Grab_Screen:    ldr     r0,     Screen_loc
+Grab_Screen:    ldr     r0,    =Screen_loc
+
 
 
 //Assumes that game starts at exactly one brick box above the screen size
@@ -144,138 +151,138 @@ Grab_Screen:    ldr     r0,     Screen_loc
 
 
 .data
-Mario_Temp:     int.    0               //Point 1 - top left corner
-                int.    150
+Mario_Temp:     .int    0               //Point 1 - top left corner
+                .int    150
 
-                int.    50               //point 2 - Top right corner
-                int.    150
+                .int    50               //point 2 - Top right corner
+                .int    150
                 
-                int.    0               //Point 3 - bottom left corner
-                int.    50
+                .int    0               //Point 3 - bottom left corner
+                .int    50
 
-                int.    50               //Point 4 - bottom right corner
-                int.    50
-Mario_loc:      int.    0               //Point 1 - top left corner
-                int.    150
+                .int    50               //Point 4 - bottom right corner
+                .int    50
+Mario_loc:      .int    0               //Point 1 - top left corner
+                .int    150
 
-                int.    50               //point 2 - Top right corner
-                int.    150
+                .int    50               //point 2 - Top right corner
+                .int    150
                 
-                int.    0               //Point 3 - bottom left corner
-                int.    50
+                .int    0               //Point 3 - bottom left corner
+                .int    50
 
-                int.    50               //Point 4 - bottom right corner
-                int.    50
+                .int    50               //Point 4 - bottom right corner
+                .int    50
 
-Goomba_loc:     int.    0
-                int.    0
+Goomba_loc:     .int    0
+                .int    0
 
-                int.    0
-                int.    0
+                .int    0
+                .int    0
                 
-                int.    0
-                int.    0
+                .int    0
+                .int    0
                 
-                int.    0
-                int.    0
+                .int    0
+                .int    0
 
-Question1_loc:  int.    450
-                int.    468
+Question1_loc:  .int    450
+                .int    468
                 
-                int.    500
-                int.    468
+                .int    500
+                .int    468
         
-                int.    450
-                int.    518
+                .int    450
+                .int    518
         
-                int.    500
-                int.    518
+                .int    500
+                .int    518
 
 
-BrickBox1_loc:  int.    400
-                int.    468
+BrickBox1_loc:  .int    400
+                .int    468
 
-                int.    450
-                int.    468
+                .int    450
+                .int    468
 
-                int.    400
-                int.    518
+                .int    400
+                .int    518
                 
-                int.    450
-                int.    518
+                .int    450
+                .int    518
 
-BrickBox2_loc:  int.    500
-                int.    468
+BrickBox2_loc:  .int    500
+                .int    468
                 
-                int.    550
-                int.    468
+                .int    550
+                .int    468
         
-                int.    500
-                int.    518
+                .int    500
+                .int    518
 
-                int.    550
-                int.    518
+                .int    550
+                .int    518
 
-BrickBox3_loc:  int.    2298
-                int.    468
+BrickBox3_loc:  .int    2298
+                .int    468
                 
-                int.    2348
-                int.    468
+                .int    2348
+                .int    468
         
-                int.    2298
-                int.    518
+                .int    2298
+                .int    518
 
-                int.    2348
-                int.    518
+                .int    2348
+                .int    518
 
-BrickBox4_loc:  int.    2248
-                int.    468
+BrickBox4_loc:  .int    2248
+                .int    468
                 
-                int.    2298
-                int.    468
+                .int    2298
+                .int    468
         
-                int.    2248
-                int.    518
+                .int    2248
+                .int    518
 
-                int.    2298
-                int.    518
+                .int    2298
+                .int    518
 
-Pipe_loc:       int.    1224
-                int.    618
+Pipe_loc:       .int    1224
+                .int    618
                 
-                int.    1324
-                int.    618
+                .int    1324
+                .int    618
         
-                int.    1224
-                int.    718
+                .int    1224
+                .int    718
 
-                int.    1324
-                int.    718
+                .int    1324
+                .int    718
 
-Hole_loc:       int.    1624
-                int.    718
+Hole_loc:       .int    1624
+                .int    718
                 
-                int.    1924
-                int.    718
+                .int    1924
+                .int    718
         
-                int.    1624
-                int.    768
+                .int    1624
+                .int    768
 
-                int.    1924
-                int.    768
-
-
-Screen_loc:     int.    0
-                int.    0
-
-Victory_line:   int.    2672
-                int.    0
+                .int    1924
+                .int    768
 
 
+Screen_loc:     .int    0
+                .int    0
 
+Victory_line:   .int    2672
+             	 .int    0
 
+Lives:          .int 3
 
+Score:          .int 0
 
+Coins:          .int 0
 
 
 

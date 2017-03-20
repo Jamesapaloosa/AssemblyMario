@@ -1,4 +1,7 @@
-///Game Starts here
+//Game Starts here
+
+
+        .global BeginGame
 
 	.equ	SEL, 0b110111111111
 	.equ	START, 0b111011111111
@@ -11,7 +14,7 @@ BeginGame:
                 bl      init_Objects	        
                 BUTTON  .req r6		// contains the button pressed
                 JUMP    .req r7         // detects if jump is over.
-                JUMPBASE.req r8         //if a jump is initiated the base value of mario's top left corner is saved
+                JUMPBASE .req r8         //if a jump is initiated the base value of mario's top left corner is saved
                 JUMPX   .req r9         //Time counter for the jump equation
 
 
@@ -26,10 +29,12 @@ BeginGame:
                 bl      MarioPrint
                 bl      PrintObjects
 GameLoop:       bl      WinCond
+                bl      SlideScreen
                 
 
                 cmp     JUMP,   #0
                 bne     noJump
+                add     JUMPX,  JUMPX
                 mov     r1,     JUMPX
                 cmp     r1,     #31
                 blt     JumpCont
@@ -61,7 +66,7 @@ Left:           mov     r0, BUTTON
                 bl      MoveMarioLR
 
 //Deal with when the a button is pushed and choose to set jump check
-Jump:           mov     r0,     Button
+Jump:           mov     r0,     BUTTON
                 ldr     r1,     =A
                 bl      checkButton
                 cmp     r0, #1
@@ -75,8 +80,8 @@ Jump:           mov     r0,     Button
                 mov     JUMPX,  #0
 
 
-start:          mov     r0,     Button
-                ldr     r1,     START
+start:          mov     r0,     BUTTON
+                ldr     r1,     =START
                 bl      checkButton     
                 cmp     r0,     #1
                 bne     GameLoop
@@ -97,9 +102,9 @@ GameOverLoop:
 PrintScreenMove:
                 push    {r4,    r10, lr}
                 mov     r4,     #1
-POLoop:         add     r4,     #1
+POSCREEN:       add     r4,     #1
                 cmp      r4,    #10
-                bge     EndPOLoop
+                bge     EndPOSCREEN
                 mov     r10,     r1
                 mov     r1,     r4
                 bl      Grab
@@ -113,22 +118,19 @@ POLoop:         add     r4,     #1
                 mov     r7,     r1
                 mov     r8,     r2
                 mov     r9,     r3
-
-                //Branch and link to Victor's converter        
-                //needs to provide two coordinates 
-
-                bl convertor
+        
+                bl displayConvert
                 cmp     r0,     #-1
-                beq     POLoop
-                ldr     r4,     blank
+                beq     POSCREEN
+                ldr     r4,     =blank
                 mov     r0,     r6
                 mov     r1,     r7
                 mov     r2,     r8
                 mov     r3,     r9
                 bl      CreateImage
-                
+                b       POSCREEN
 
-EndPOLoop:      pop     {r4,    r10,    lr}
+EndPOSCREEN:      pop     {r4,    r10,    lr}
                 bx      lr   
 
 
@@ -156,11 +158,7 @@ POLoop:         add     r4,     #1
                 mov     r7,     r1
                 mov     r8,     r2
                 mov     r9,     r3
-
-                //Branch and link to Victor's converter        
-                //needs to provide two coordinates 
-
-                bl convertor
+                bl      displayConvert
                 cmp     r0,     #-1
                 beq     POLoop
                 bl      GrabImage
@@ -191,11 +189,7 @@ MarioPrint:    push    {r4,    r10, lr}
 	        ldr	r1,     [r5], #20	// initial y
 	        ldr	r2,     [r5], #4 	// final x
 	        ldr	r3,     [r5]	        // final y
-
-                //Branch and link to Victor's converter        
-                //needs to provide two coordinates 
-
-                bl convertor
+                bl      displayConvert
 	        mov     r4,     r10
 	        bl	CreateImage
                 
@@ -212,15 +206,11 @@ EraseMario:     push    {r2,    r10, lr}
 	        ldr	r1,     [r5], #20	// initial y
 	        ldr	r2,     [r5], #4 	// final x
 	        ldr	r3,     [r5]	        // final y
-
-                //Branch and link to Victor's converter        
-                //needs to provide two coordinates 
-
-                bl convertor
+                bl      displayConvert
 	        ldr     r4,     =blank
 	        bl	CreateImage
                 
-EndMarioPrint:  pop     {r2,    r10, lr}
+EndEraseMario:  pop     {r2,    r10, lr}
                 bx      lr
 //===================================================
 Wait:
@@ -242,64 +232,68 @@ MoveMarioLR:
                 push    {r4,    r10,    lr}
                 bl      EraseMario
                 mov     r0,     #0b00000
-                mov     r4,     r1              //put the direction value in a safe place
+                mov     r7,     r1              //put the direction value in a safe place
                 mov     r8,     r2              //put the jump state in a safe place
                 bl      Grab
                 mov     r5,     r0
                 ldr     r0,     [r5]
-                add     r0,     r0,     r4
+                add     r0,     r0,     r7
                 str     r0,     [r5],   #8
                 ldr     r1,     [r5]
-                add     r1,     r1,     r4
+                add     r1,     r1,     r7
                 str     r1,     [r5],   #8
                 ldr     r2,     [r5]
-                add     r2,     r2,     r4
+                add     r2,     r2,     r7
                 str     r2,     [r5],   #8
                 ldr     r3,     [r5]
-                add     r3,     r3,     r4
+                add     r3,     r3,     r7
                 str     r3,     [r5],   #8
+                //check for move off of screen
+                cmp     r0,     #0
+                blt     EndMoveMarioLR
+
                 //Check for collision and undo movement if so
                 bl      objectCollision
                 cmp     r0,     #0
                 beq     nocol1
-                mov     r1,     r4
+                mov     r1,     r7
                 mov     r2,     r0
                 bl      CollisionHandler
                 b       EndMoveMarioLR
                 
 
-nocol1          
+nocol1:          
                 mov     r0,     #0b00001
                 bl      Grab
                 mov     r5,     r0
                 ldr     r0,     [r5]
-                add     r0,     r0,     r4
+                add     r0,     r0,     r7
                 str     r0,     [r5],   #8
                 ldr     r1,     [r5]
-                add     r1,     r1,     r4
+                add     r1,     r1,     r7
                 str     r1,     [r5],   #8
                 ldr     r2,     [r5]
-                add     r2,     r2,     r4
+                add     r2,     r2,     r7
                 str     r2,     [r5],   #8
                 ldr     r3,     [r5]
-                add     r3,     r3,     r4
+                add     r3,     r3,     r7
                 str     r3,     [r5],   #8
-                
+                bl      displayConvert
                 cmp     r8,     #0
                 beq     NoJump1
-                cmp     r4,     #0
-                b.lt    JumpLeft1
-                ldr     r1,     =MarioJumpLeftImg
+                cmp     r7,     #0
+                blt    JumpLeft1
+                ldr     r4,     =MarioJumpLeftImg
                 b       MoveMario2
-JumpLeft1:      ldr     r1,     =MarioJumpRightImg             
+JumpLeft1:      ldr     r4,     =MarioJumpRightImg             
                 
 
                 //if not jumping, decide which way to face
-NoJump1:        cmp     r4,     #0
-                b.lt    WalkLeft1
-                ldr     r1,     =MarioWalkRImg
+NoJump1:        cmp     r7,     #0
+                blt     WalkLeft1
+                ldr     r4,     =MarioWalkRImg
                 b       MoveMario1
-WalkLeft1:      ldr     r1,     =MarioWalkLImg
+WalkLeft1:      ldr     r4,     =MarioWalkLImg
 MoveMario1:     bl      MarioPrint
 
                 bl      EraseMario
@@ -307,22 +301,25 @@ MoveMario1:     bl      MarioPrint
                 bl      Grab
                 mov     r5,     r0
                 ldr     r1,     [r5]
-                add     r1,     r1,     r4
+                add     r1,     r1,     r7
                 str     r1,     [r5],   #8
                 ldr     r1,     [r5]
-                add     r1,     r1,     r4
+                add     r1,     r1,     r7
                 str     r1,     [r5],   #8
                 ldr     r1,     [r5]
-                add     r1,     r1,     r4
+                add     r1,     r1,     r7
                 str     r1,     [r5],   #8
                 ldr     r1,     [r5]
-                add     r1,     r1,     r4
+                add     r1,     r1,     r7
                 str     r1,     [r5],   #8
+                //check for move off of screen
+                cmp     r0,     #0
+                blt     EndMoveMarioLR
 
                 bl      objectCollision
                 cmp     r0,     #0
                 beq     nocol2
-                mov     r1,     r4
+                mov     r1,     r7
                 mov     r2,     r0
                 bl      CollisionHandler
                 b       EndMoveMarioLR
@@ -331,32 +328,33 @@ nocol2:         mov     r0,     #0b00001
                 bl      Grab
                 mov     r5,     r0
                 ldr     r0,     [r5]
-                add     r0,     r0,     r4
+                add     r0,     r0,     r7
                 str     r0,     [r5],   #8
                 ldr     r1,     [r5]
-                add     r1,     r1,     r4
+                add     r1,     r1,     r7
                 str     r1,     [r5],   #8
                 ldr     r2,     [r5]
-                add     r2,     r2,     r4
+                add     r2,     r2,     r7
                 str     r2,     [r5],   #8
                 ldr     r3,     [r5]
-                add     r3,     r3,     r4
+                add     r3,     r3,     r7
                 str     r3,     [r5],   #8
+                bl      displayConvert
 
 EndMoveMarioLR:
                 cmp     r8,     #0
                 beq     NoJump1
-                cmp     r4,     #0
-                b.lt    JumpLeft2
-                ldr     r1,     =MarioJumpLeftImg
+                cmp     r7,     #0
+                blt    JumpLeft2
+                ldr     r4,     =MarioJumpLeftImg
                 b       MoveMario2
-JumpLeft2:      ldr     r1,     =MarioJumpRightImg      
-                cmp     r4,     #0
-                b.lt    WalkLeft
-                ldr     r1,     =MarioStandRImg
+JumpLeft2:      ldr     r4,     =MarioJumpRightImg      
+                cmp     r7,     #0
+                blt    WalkLeft
+                ldr     r4,     =MarioStandRImg
                 b       MoveMario2
-WalkLeft:       ldr     r1,     =MariStandLImg
-MoveMario2      bl      MarioPrint
+WalkLeft:       ldr     r4,     =MariStandLImg
+MoveMario2:     bl      MarioPrint
                 pop     {r4,    r10,    lr}
                 bx      lr
 //===================================================
@@ -366,13 +364,17 @@ MoveMario2      bl      MarioPrint
 //the question box needs to change to a brick box and mario is pushed back to his old location
 //If it is with a brick then mario is moved back his movement amount. If it is with a goomba, 
 //from the side, mario dies. If it is with a goomba from above, Mario kills the goomba, if it
-//is a collision with ground, Mario is not moved NOT DONE
+//is a collision with ground, Mario is not moved NOT DONE - Victor
+//Can destroy wooden boxes
 CollisionHandler:
                 push    {r4,    r10,    lr}
-                pop     {r4,    r10,    lr}
+
+                mov     r1,     r8
+                mov     r2,     r9
 
 
 
+                pop     {r4,    r10,    lr} 
                 bx      lr
 
 
@@ -381,8 +383,11 @@ CollisionHandler:
 //Based on the equation 30x - x^2
 //Takes in the x value in r1 which represents time against the y value 
 //Takes in the initial height of mario's top left corner in r2
+//Returns if collision happend so that jump can end
+//YET TO DEAL WITH COLLISIONS
 MarioJump:
                 push    {r3,    r10,    lr}
+                bl      EraseMario
                 mov     r8,     r1                      //place the mario x value for the jump in r8
                 mov     r9,     r2                      //place the mario initial y value in r9
 //Calculate the new y coordinates of Mario
@@ -400,7 +405,7 @@ MarioJump:
                 str     r8,     [r5],   #8
                 str     r8,     [r5],   #8
                 
-                sub     r8,     r8,     #100
+                add     r8,     r8,     #100
                 str     r8,     [r5],   #8
                 str     r8,     [r5]
 
@@ -415,7 +420,7 @@ MarioJump:
 
 //===================================================
 //Takes in an input that tells whether jump is true or not. If jump is false then mario can fall. If
-//Jump is true then mario will not fall. r0 = 1 is jump true, r0 = 0 is jump is false NOT DONE
+//Jump is true then mario will not fall. r0 = 1 is jump true, r0 = 0 is jump is false NOT DONE - Nantong
 MarioFall:
 
 
@@ -429,7 +434,7 @@ WinCond:        push    {r3,    r10,    lr}
                 mov     r1,     #1
                 bl      Grab
                 ldr     r1,     [r0]
-                ldr     r2,     =#2772
+                ldr     r2,     =2772
                 cmp     r1,     r2
                 blt     EndWinCond
                 mov	r0, #0		// initial x
@@ -443,18 +448,31 @@ WinCond:        push    {r3,    r10,    lr}
 EndWinCond:     pop     {r3,    r10,    lr}
                 bx      lr
 
+//===================================================
+//NOT DONE - James
+SlideScreen:    push    {r3,    r10,    lr}
+                
+                mov     r1,     #1
+                bl      Grab    
+                mov     r7,     r0
+
+                
+
+                pop     {r3,    r10,    lr}
+                bx      lr
+//===================================================
+//Check for life loss
+//NOT DONE - James
+LifeLoss:
 
 
+//===================================================
+//Pause Menu
+//NOT DONE - Nantong
 
-
-
-
-
-
-
-
-
-
+//===================================================
+//Score Printer prints score, coins and lives
+//NOT DONE - James
 
 
 
