@@ -10,19 +10,38 @@ init_Objects:   push    {r0 - r10}
                 ldr     r0,     =Mario_loc
                 mov     r1,     #0
                 str     r1,     [r0], #4
-                movw     r1,     #618
+                movw     r1,     #668
                 str     r1,     [r0], #4
-                mov     r1,     #50
+                mov     r1,     #49
                 str     r1,     [r0], #4
-                movw     r1,     #618
+                movw     r1,     #668
                 str     r1,     [r0], #4
                 mov     r1,     #0
                 str     r1,     [r0], #4
-                mov     r1,     #668
+                ldr     r1,     =718
                 str     r1,     [r0], #4
-                mov     r1,     #50
+                mov     r1,     #49
                 str     r1,     [r0], #4
-                mov     r1,     #668
+                ldr     r1,     =718
+                str     r1,     [r0], #4
+
+                //Initialize temp
+                ldr     r0,     =Mario_Temp
+                mov     r1,     #0
+                str     r1,     [r0], #4
+                movw     r1,     #668
+                str     r1,     [r0], #4
+                mov     r1,     #49
+                str     r1,     [r0], #4
+                movw     r1,     #668
+                str     r1,     [r0], #4
+                mov     r1,     #0
+                str     r1,     [r0], #4
+                ldr     r1,     =718
+                str     r1,     [r0], #4
+                mov     r1,     #49
+                str     r1,     [r0], #4
+                ldr     r1,     =718
                 str     r1,     [r0], #4
 
                 //Initialize goomba
@@ -31,7 +50,7 @@ init_Objects:   push    {r0 - r10}
                 str     r1,     [r0], #4
                 mov     r1,     #668
                 str     r1,     [r0], #4
-                mov     r1,     #2672
+                mov     r1,     #2671
                 str     r1,     [r0], #4
                 mov     r1,     #668
                 str     r1,     [r0], #4
@@ -39,7 +58,7 @@ init_Objects:   push    {r0 - r10}
                 str     r1,     [r0], #4
                 movw     r1,     #718
                 str     r1,     [r0], #4
-                mov     r1,     #2672
+                mov     r1,     #2671
                 str     r1,     [r0], #4
                 movw     r1,     #718
             
@@ -66,6 +85,7 @@ init_Objects:   push    {r0 - r10}
 //Unbreakable Box2 00101
 //Unbreakable Box3 00110
 //Unbreakable Box4 00111
+//BulletBill 01000
 //Pipe 01000
 //Hole 01001
 
@@ -74,74 +94,90 @@ init_Objects:   push    {r0 - r10}
 
 //r1 = the nubmer code of the object you want
 //r0 = address of object
-Grab:           push    {r2 - r10}
-                cmp     r1,     #0b00000
+Grab:           push    {r2 - r10, lr}
                 ldr     r0,     =Mario_Temp
+                cmp     r1,     #0b00000
                 beq     endGrab
-                cmp     r1,     #0b00001
                 ldr     r0,     =Mario_loc
+                cmp     r1,     #0b00001
                 beq     endGrab
-                cmp     r1,     #0b00010
                 ldr     r0,     =Goomba_loc
+                cmp     r1,     #0b00010
                 beq     endGrab
-                cmp     r1,     #0b00011
                 ldr     r0,     =Question1_loc
+                cmp     r1,     #0b00011
                 beq     endGrab
-                cmp     r1,     #0b00100
                 ldr     r0,     =BrickBox1_loc
+                cmp     r1,     #0b00100
                 beq     endGrab
-                cmp     r1,     #0b00101
                 ldr     r0,     =BrickBox2_loc
+                cmp     r1,     #0b00101
                 beq     endGrab
-                cmp     r1,     #0b00110
                 ldr     r0,     =BrickBox3_loc
+                cmp     r1,     #0b00110
+
                 beq     endGrab
-                cmp     r1,     #0b00111
                 ldr     r0,     =BrickBox4_loc
+                cmp     r1,     #0b00111
+
                 beq     endGrab
-                cmp     r1,     #0b01000
                 ldr     r0,     =Pipe_loc
+                cmp     r1,     #0b01000
+
                 beq     endGrab
-                cmp     r1,     #0b01001
                 ldr     r0,     =Hole_loc
+                cmp     r1,     #0b01001
+
                 beq     endGrab
                 mov     r0,     #-1
 
 endGrab:        pop     {r2 - r10}
                 bx      lr
 
+//Image ID stored in r1
 GrabImage:      push    {r2 - r10}
-                cmp     r1,     #0b00010
                 ldr     r0,     =GoombaImage
+                cmp     r1,     #0b00010
+
                 beq     endGrab
+                ldr     r0,     =box
                 cmp     r1,     #0b00011
-                ldr     r0,     =Question1Image
+
                 beq     endGrab
+                ldr     r0,     =brick
                 cmp     r1,     #0b00100
-                ldr     r0,     =BrickBoxImage
+
                 beq     endGrab
+                ldr     r0,     =brick
                 cmp     r1,     #0b00101
-                ldr     r0,     =BrickBoxImage
+
                 beq     endGrab
+                ldr     r0,     =brick
                 cmp     r1,     #0b00110
-                ldr     r0,     =BrickBoxImage
+
                 beq     endGrab
+                ldr     r0,     =brick
                 cmp     r1,     #0b00111
-                ldr     r0,     =BrickBoxImage
+
                 beq     endGrab
+                ldr     r0,     =pipe2
                 cmp     r1,     #0b01000
-                ldr     r0,     =PipeImage
+
                 beq     endGrab
-                cmp     r1,     #0b01001
                 ldr     r0,     =HoleImage
+                cmp     r1,     #0b01001
+
                 beq     endGrab
                 mov     r0,     #-1
 
-endGrabImage:        pop     {r2 - r10}
+endGrabImage:   pop     {r2 - r10, lr}
                 bx      lr
 
-
-Grab_Screen:    ldr     r0,    =Screen_loc
+.global Grab_Screen
+Grab_Screen:    push    {r2 - r10, lr}
+                ldr     r0,    =Screen_loc
+                pop     {r2 - r10, lr}
+                bx      lr
 
 
 
@@ -189,77 +225,89 @@ Goomba_loc:     .int    0
 Question1_loc:  .int    450
                 .int    468
                 
-                .int    500
+                .int    499
                 .int    468
         
                 .int    450
                 .int    518
         
-                .int    500
+                .int    499
                 .int    518
 
 
 BrickBox1_loc:  .int    400
                 .int    468
 
-                .int    450
+                .int    449
                 .int    468
 
                 .int    400
                 .int    518
                 
-                .int    450
+                .int    449
                 .int    518
 
 BrickBox2_loc:  .int    500
                 .int    468
                 
-                .int    550
+                .int    549
                 .int    468
         
                 .int    500
                 .int    518
 
-                .int    550
+                .int    549
                 .int    518
 
 BrickBox3_loc:  .int    2298
                 .int    468
                 
-                .int    2348
+                .int    2347
                 .int    468
         
                 .int    2298
                 .int    518
 
-                .int    2348
+                .int    2347
                 .int    518
 
 BrickBox4_loc:  .int    2248
                 .int    468
                 
-                .int    2298
+                .int    2297
                 .int    468
         
                 .int    2248
                 .int    518
 
-                .int    2298
+                .int    2297
                 .int    518
 
 Pipe_loc:       .int    1224
                 .int    618
                 
-                .int    1324
+                .int    1323
                 .int    618
         
                 .int    1224
                 .int    718
 
-                .int    1324
+                .int    1323
                 .int    718
 
 Hole_loc:       .int    1624
+                .int    718
+                
+                .int    1923
+                .int    718
+        
+                .int    1624
+                .int    768
+
+                .int    1923
+                .int    768
+
+Bill_loc:       .int    1624
                 .int    718
                 
                 .int    1924
@@ -277,12 +325,6 @@ Screen_loc:     .int    0
 
 Victory_line:   .int    2672
              	 .int    0
-
-Lives:          .int 3
-
-Score:          .int 0
-
-Coins:          .int 0
 
 
 

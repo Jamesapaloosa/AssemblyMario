@@ -17,15 +17,15 @@ screenXRight .req r9
 
 
 ldr r5, =Screen_loc
-bl Grab
+//bl Grab               Why is this here?
 
 ldr screenXLeft,	[r5], #4
 ldr screenXRight, [r5]
 
-cmp x4, screenXLeft
+cmp x1, screenXLeft
 blt	notAllowed			//check if right x value of object is on left side of the left edge
 
-cmp x1, screenXRight
+cmp x4, screenXRight
 bgt	notAllowed			//check if left x value of object is on the right side of the right edge
 
 Allowed:
