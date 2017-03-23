@@ -131,8 +131,7 @@ Grab:           push    {r2 - r10, lr}
                 beq     endGrab
                 mov     r0,     #-1
 
-endGrab:        pop     {r2 - r10}
-                bx      lr
+endGrab:        pop     {r2 - r10, pc}
 
 //Image ID stored in r1
 GrabImage:      push    {r2 - r10}
