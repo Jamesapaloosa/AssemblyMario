@@ -6,7 +6,7 @@
 
 
 //Initialize Mario and Goomba to gamestart locations
-init_Objects:   push    {r0 - r10}
+init_Objects:   push    {r0 - r10, lr}
                 ldr     r0,     =Mario_loc
                 mov     r1,     #0
                 str     r1,     [r0], #4
@@ -72,8 +72,7 @@ init_Objects:   push    {r0 - r10}
                 str     r1,     [r0]
 
 
-                pop     {r0 - r10}
-                bx      lr
+                pop     {r0 - r10, pc}
 
 
 //Object codes are as follows:
@@ -134,7 +133,7 @@ Grab:           push    {r2 - r10, lr}
 endGrab:        pop     {r2 - r10, pc}
 
 //Image ID stored in r1
-GrabImage:      push    {r2 - r10}
+GrabImage:      push    {r2 - r10, lr}
                 ldr     r0,     =GoombaImage
                 cmp     r1,     #0b00010
 
@@ -169,8 +168,7 @@ GrabImage:      push    {r2 - r10}
                 beq     endGrab
                 mov     r0,     #-1
 
-endGrabImage:   pop     {r2 - r10, lr}
-                bx      lr
+endGrabImage:   pop     {r2 - r10, pc}
 
 .global Grab_Screen
 Grab_Screen:    push    {r2 - r10, lr}
