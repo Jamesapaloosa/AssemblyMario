@@ -10,11 +10,11 @@ init_Objects:   push    {r0 - r10, lr}
                 ldr     r0,     =Mario_loc
                 mov     r1,     #0
                 str     r1,     [r0], #4
-                movw     r1,     #668
+                ldr     r1,     =668
                 str     r1,     [r0], #4
                 mov     r1,     #49
                 str     r1,     [r0], #4
-                movw     r1,     #668
+                ldr     r1,     =668
                 str     r1,     [r0], #4
                 mov     r1,     #0
                 str     r1,     [r0], #4
@@ -29,11 +29,11 @@ init_Objects:   push    {r0 - r10, lr}
                 ldr     r0,     =Mario_Temp
                 mov     r1,     #0
                 str     r1,     [r0], #4
-                movw     r1,     #668
+                ldr     r1,     =668
                 str     r1,     [r0], #4
                 mov     r1,     #49
                 str     r1,     [r0], #4
-                movw     r1,     #668
+                ldr     r1,     =668
                 str     r1,     [r0], #4
                 mov     r1,     #0
                 str     r1,     [r0], #4
@@ -46,21 +46,21 @@ init_Objects:   push    {r0 - r10, lr}
 
                 //Initialize goomba
                 ldr     r0,     =Goomba_loc
-                movw     r1,     #2622
+                ldr     r1,     =2622
                 str     r1,     [r0], #4
-                mov     r1,     #668
+                ldr     r1,     =668
                 str     r1,     [r0], #4
-                mov     r1,     #2671
+                ldr     r1,     =2671
                 str     r1,     [r0], #4
-                mov     r1,     #668
+                ldr     r1,     =668
                 str     r1,     [r0], #4
-                movw     r1,     #2622
+                ldr     r1,     =2622
                 str     r1,     [r0], #4
-                movw     r1,     #718
+                ldr     r1,     =718
                 str     r1,     [r0], #4
-                mov     r1,     #2671
+                ldr     r1,     =2671
                 str     r1,     [r0], #4
-                movw     r1,     #718
+                ldr     r1,     =718
             
                 str     r1,     [r0], #4
 
