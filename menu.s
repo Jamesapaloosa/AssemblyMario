@@ -16,10 +16,16 @@ startMenu:
 	mov	r0, #0		// initial x
 	mov	r1, #0		// initial y
 	ldr	r2, =1023	// final x
-	ldr	r3, =575	// final y
+	ldr	r3, =767	// final y
 	ldr	r4, =menu_pic
 	bl	CreateImage
 
+	ldr	r0, =328	// initial x
+	ldr	r1, =379	// initial y
+	ldr	r2, =359	// final x
+	ldr	r3, =411	// final y
+	ldreq	r4, =mushroom
+	bleq	CreateImage
 
 
 
@@ -31,7 +37,7 @@ menuloop:
 	ldr	r1, =A		// arg 2: desired button
 	bl	checkButton	// check if user pressed A
 	cmp	r0, #1		
-	beq	menuexit
+	beq     Selection
 
 	mov	r0, BUTTON	// arg 1: the user input
 	ldr	r1, =UP		// arg 2: desired button
@@ -41,10 +47,17 @@ menuloop:
 	moveq	FLAG, #1	// if so, selection is moved to 'start game'
 
 	ldr	r0, =328	// initial x
+	ldr	r1, =479	// initial y
+	ldr	r2, =359	// final x
+	ldr	r3, =511	// final y
+	ldreq	r4, =sky
+	bleq	CreateImage
+
+	ldr	r0, =328	// initial x
 	ldr	r1, =379	// initial y
-	ldr	r2, =377	// final x
-	ldr	r3, =428	// final y
-	ldreq	r4, =selector
+	ldr	r2, =359	// final x
+	ldr	r3, =411	// final y
+	ldreq	r4, =mushroom
 	bleq	CreateImage
 	
 
@@ -56,16 +69,24 @@ menuloop:
 	moveq	FLAG, #0	// if so, selection is moved to 'quit game'
 
 	ldr	r0, =328	// initial x
+	ldr	r1, =379	// initial y
+	ldr	r2, =359	// final x
+	ldr	r3, =411	// final y
+	ldreq	r4, =sky
+	bleq	CreateImage
+
+	ldr	r0, =328	// initial x
 	ldr	r1, =479	// initial y
-	ldr	r2, =377	// final x
-	ldr	r3, =528	// final y
-	ldreq	r4, =selector
+	ldr	r2, =359	// final x
+	ldr	r3, =511	// final y
+	ldreq	r4, =mushroom
 	bleq	CreateImage
 	
 
 	b	menuloop
 
-
+Selection:      cmp     FLAG,   #1
+                bl      BeginGame
 
 menuexit:
 	mov	r0, FLAG

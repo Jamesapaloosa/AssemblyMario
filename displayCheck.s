@@ -37,5 +37,4 @@ mov r0, #0			//return #0 if drawing is not allowed
 
 exit:
 
-pop {r4-r9, lr}
-bx lr
+pop {r4-r9, pc}

@@ -18,11 +18,10 @@ BeginGame:
                 JUMPBASE .req r8         //if a jump is initiated the base value of mario's top left corner is saved
                 JUMPX   .req r9         //Time counter for the jump equation
                 bl      PrintGameScreen
-                bl      InitializeScore             //UP TO HERE WORKS
+                bl      InitializeScore  
 
                 ldr     r1,     =MarioStandRImg
                 bl      MarioPrint
-                b       GameOverLoop
         
                 bl      PrintObjects
 
@@ -45,15 +44,15 @@ JumpCont:       mov     r2,     JUMPBASE
                 mov     JUMP,   #0
                 
 //Code that exicutes after the jump is dealt with
-noJump:	        bl	getInput
+noJump:	        bl	getInput           //UP TO HERE WORKS
 	        mov	BUTTON, r0
-	
+TEST:	
 	        mov	r0, BUTTON	// arg 1: the user input
 	        ldr	r1, =RIGHT	// arg 2: desired button
 	        bl	checkButton	// check if user pressed A
 	        cmp	r0, #1	
                 bne     Left	
-                mov     r1,     #16
+                mov     r1,     #4
                 mov     r2,     JUMP
                 bl      MoveMarioLR
 Left:           mov     r0, BUTTON
@@ -61,7 +60,7 @@ Left:           mov     r0, BUTTON
                 bl      checkButton
                 cmp     r0,     #1
                 bne     Jump
-                mov     r1,     #-16
+                mov     r1,     #-4
                 mov     r2,     JUMP
                 bl      MoveMarioLR
 
@@ -220,8 +219,8 @@ Checktime:      ldr     r2,     [r0]                    //loop that decides if t
 //Nees to check if move out of screen
 MoveMarioLR:
                 push    {r3 - r10,    lr}
-                mov     r1,     #0b00000
                 mov     r7,     r1              //put the direction value in a safe place
+                mov     r1,     #0b00000
                 mov     r8,     r2              //put the jump state in a safe place
                 bl      Grab
                 mov     r5,     r0
@@ -240,7 +239,7 @@ MoveMarioLR:
                 //check for move off of screen
                 cmp     r0,     #0
                 blt     EndMoveMarioLR
-
+                b       nocol1
                 //Check for collision and undo movement if so
                 bl      objectCollision
                 cmp     r0,     #0
@@ -273,10 +272,10 @@ nocol1:
                 beq     NoJump1
                 cmp     r7,     #0
                 blt    JumpLeft1
-                ldr     r4,     =MarioJumpLeftImg
+                ldr     r1,     =MarioJumpLeftImg
                 b       MoveMario1
 JumpLeft1:      
-                ldr     r4,     =MarioJumpRightImg
+                ldr     r1,     =MarioJumpRightImg
                 b       MoveMario1       
                 
 
@@ -284,10 +283,10 @@ JumpLeft1:
 NoJump1:        
                 cmp     r7,     #0
                 blt     WalkLeft1
-                ldr     r4,     =MarioWalkRImg
+                ldr     r1,     =MarioWalkRImg
                 b       MoveMario1
 WalkLeft1:      
-                ldr     r4,     =MarioWalkLImg
+                ldr     r1,     =MarioWalkLImg
 MoveMario1:     
                 bl      MarioPrint
 
@@ -311,6 +310,7 @@ MoveMario1:
                 //check for move off of screen
                 cmp     r0,     #0
                 blt     EndMoveMarioLR
+                b       nocol2
                 //Check for collision again
                 bl      objectCollision
                 cmp     r0,     #0
@@ -321,6 +321,7 @@ MoveMario1:
                 b       EndMoveMarioLR
 
 nocol2:         
+                mov     r0,     #200              
                 bl      EraseMario
                 mov     r1,     #0b00001
                 bl      Grab
@@ -341,23 +342,23 @@ nocol2:
 
 
                 cmp     r8,     #0
-                beq     NoJump1
+                beq     NoJump2
                 cmp     r7,     #0
                 blt    JumpLeft2
-                ldr     r4,     =MarioJumpLeftImg
+                ldr     r1,     =MarioJumpLeftImg
                 b       MoveMario2
 JumpLeft2:      
-                ldr     r4,     =MarioJumpRightImg
+                ldr     r1,     =MarioJumpRightImg
                 b       MoveMario2       
                 //if not jumping, decide which way to face
 NoJump2:        
                 cmp     r7,     #0
                 blt     WalkLeft2
 EndMoveMarioLR: 
-                ldr     r4,     =MarioWalkRImg
+                ldr     r1,     =MarioStandRImg
                 b       MoveMario2
 WalkLeft2:      
-                ldr     r4,     =MarioWalkLImg
+                ldr     r1,     =MarioStandLImg
 MoveMario2:     
                 bl      MarioPrint
 
@@ -535,7 +536,8 @@ LifeLoss:
                 push    {r3 - r10,    lr}
 
                 ldr     r0,     =Life
-                cmp     r0,     #0
+                ldr     r1,     [r0]
+                cmp     r1,     #0
                 bgt     LifeLossEnd
                 bl      PrintGameScreen
                 b       GameOverLoop

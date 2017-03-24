@@ -10,57 +10,57 @@ init_Objects:   push    {r0 - r10, lr}
                 ldr     r0,     =Mario_loc
                 mov     r1,     #0
                 str     r1,     [r0], #4
-                ldr     r1,     =668
+                ldr     r1,     =681
                 str     r1,     [r0], #4
-                mov     r1,     #49
+                mov     r1,     #31
                 str     r1,     [r0], #4
-                ldr     r1,     =668
+                ldr     r1,     =681
                 str     r1,     [r0], #4
                 mov     r1,     #0
                 str     r1,     [r0], #4
-                ldr     r1,     =718
+                ldr     r1,     =713
                 str     r1,     [r0], #4
-                mov     r1,     #49
+                mov     r1,     #31
                 str     r1,     [r0], #4
-                ldr     r1,     =718
+                ldr     r1,     =713
                 str     r1,     [r0], #4
 
                 //Initialize temp
                 ldr     r0,     =Mario_Temp
                 mov     r1,     #0
                 str     r1,     [r0], #4
-                ldr     r1,     =668
+                ldr     r1,     =681
                 str     r1,     [r0], #4
-                mov     r1,     #49
+                mov     r1,     #31
                 str     r1,     [r0], #4
-                ldr     r1,     =668
+                ldr     r1,     =681
                 str     r1,     [r0], #4
                 mov     r1,     #0
                 str     r1,     [r0], #4
-                ldr     r1,     =718
+                ldr     r1,     =713
                 str     r1,     [r0], #4
-                mov     r1,     #49
+                mov     r1,     #31
                 str     r1,     [r0], #4
-                ldr     r1,     =718
+                ldr     r1,     =713
                 str     r1,     [r0], #4
 
                 //Initialize goomba
                 ldr     r0,     =Goomba_loc
                 ldr     r1,     =2622
                 str     r1,     [r0], #4
-                ldr     r1,     =668
+                ldr     r1,     =704
                 str     r1,     [r0], #4
-                ldr     r1,     =2671
+                ldr     r1,     =2653
                 str     r1,     [r0], #4
-                ldr     r1,     =668
+                ldr     r1,     =704
                 str     r1,     [r0], #4
                 ldr     r1,     =2622
                 str     r1,     [r0], #4
-                ldr     r1,     =718
+                ldr     r1,     =736
                 str     r1,     [r0], #4
-                ldr     r1,     =2671
+                ldr     r1,     =2653
                 str     r1,     [r0], #4
-                ldr     r1,     =718
+                ldr     r1,     =736
             
                 str     r1,     [r0], #4
 
@@ -73,7 +73,6 @@ init_Objects:   push    {r0 - r10, lr}
 
 
                 pop     {r0 - r10, pc}
-
 
 //Object codes are as follows:
 //MarioTemp 00000
@@ -134,7 +133,7 @@ endGrab:        pop     {r2 - r10, pc}
 
 //Image ID stored in r1
 GrabImage:      push    {r2 - r10, lr}
-                ldr     r0,     =GoombaImage
+                ldr     r0,     =goomba
                 cmp     r1,     #0b00010
 
                 beq     endGrab
@@ -162,7 +161,7 @@ GrabImage:      push    {r2 - r10, lr}
                 cmp     r1,     #0b01000
 
                 beq     endGrab
-                ldr     r0,     =HoleImage
+                ldr     r0,     =sky
                 cmp     r1,     #0b01001
 
                 beq     endGrab
@@ -185,27 +184,27 @@ Grab_Screen:    push    {r2 - r10, lr}
 
 .data
 Mario_Temp:     .int    0               //Point 1 - top left corner
-                .int    150
+                .int    0
 
-                .int    50               //point 2 - Top right corner
-                .int    150
+                .int    0              //point 2 - Top right corner
+                .int    0
                 
                 .int    0               //Point 3 - bottom left corner
-                .int    50
+                .int    0
 
-                .int    50               //Point 4 - bottom right corner
-                .int    50
+                .int    0               //Point 4 - bottom right corner
+                .int    0
 Mario_loc:      .int    0               //Point 1 - top left corner
-                .int    150
+                .int    0
 
-                .int    50               //point 2 - Top right corner
-                .int    150
+                .int    0               //point 2 - Top right corner
+                .int    0
                 
                 .int    0               //Point 3 - bottom left corner
-                .int    50
+                .int    0
 
-                .int    50               //Point 4 - bottom right corner
-                .int    50
+                .int    0               //Point 4 - bottom right corner
+                .int    0
 
 Goomba_loc:     .int    0
                 .int    0
@@ -220,100 +219,100 @@ Goomba_loc:     .int    0
                 .int    0
 
 Question1_loc:  .int    450
-                .int    468
+                .int    576
                 
-                .int    499
-                .int    468
+                .int    481
+                .int    576
         
                 .int    450
-                .int    518
+                .int    608
         
-                .int    499
-                .int    518
+                .int    481
+                .int    608		
 
 
 BrickBox1_loc:  .int    400
-                .int    468
+                .int    576		
 
-                .int    449
-                .int    468
+                .int    431
+                .int    576
 
                 .int    400
-                .int    518
+                .int    608
                 
-                .int    449
-                .int    518
+                .int    431
+                .int    608
 
 BrickBox2_loc:  .int    500
-                .int    468
+                .int    576
                 
-                .int    549
-                .int    468
+                .int    531
+                .int    576
         
                 .int    500
-                .int    518
+                .int    608
 
-                .int    549
-                .int    518
+                .int    531
+                .int    608
 
 BrickBox3_loc:  .int    2298
-                .int    468
+                .int    576
                 
-                .int    2347
-                .int    468
+                .int    2329
+                .int    576    	
         
-                .int    2298
-                .int    518
+                .int    2297
+                .int    608
 
-                .int    2347
-                .int    518
+                .int    2330
+                .int    608		
 
 BrickBox4_loc:  .int    2248
-                .int    468
+                .int    576
                 
-                .int    2297
-                .int    468
+                .int    2279
+                .int    576
         
                 .int    2248
-                .int    518
+                .int    608
 
-                .int    2297
-                .int    518
+                .int    2279
+                .int    608
 
 Pipe_loc:       .int    1224
-                .int    618
+                .int    672		
                 
-                .int    1323
-                .int    618
+                .int    1255
+                .int    672
         
                 .int    1224
-                .int    718
+                .int    736
 
-                .int    1323
-                .int    718
+                .int    1255
+                .int    736
 
 Hole_loc:       .int    1624
-                .int    718
+                .int    736
                 
-                .int    1923
-                .int    718
+                .int    1814
+                .int    736
         
                 .int    1624
                 .int    768
 
-                .int    1923
+                .int    1814
                 .int    768
 
 Bill_loc:       .int    1624
-                .int    718
+                .int    736
                 
-                .int    1924
-                .int    718
+                .int    1815
+                .int    736
         
                 .int    1624
                 .int    768
 
-                .int    1924
+                .int    1815
                 .int    768
 
 
