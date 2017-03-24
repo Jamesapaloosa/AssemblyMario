@@ -1,6 +1,6 @@
 //Game Starts here
 
-
+        .section .text
         .global BeginGame
 
 	.equ	SEL, 0b110111111111
@@ -18,18 +18,16 @@ BeginGame:
                 JUMPX   .req r9         //Time counter for the jump equation
 
 
-
-                mov	r0, #0		// initial x
-	        mov	r1, #0		// initial y
-	        ldr	r2, =1023	// final x
-	        ldr	r3, =767	// final y
-	        ldr	r4, =GameScreen 
-	        bl	CreateImage
+test:
+                bl      PrintGameScreen
                 bl      InitializeScore
                 ldr     r1,     =MarioStandRImg
                 bl      MarioPrint
-                bl      PrintObjects             //UP TO HERE WORKS
 
+Test2:
+        
+                bl      PrintObjects             //UP TO HERE WORKS
+Test3:
 
 GameLoop:       bl      WinCond
                 bl      SlideScreen
@@ -58,7 +56,7 @@ noJump:	        bl	getInput
 	        bl	checkButton	// check if user pressed A
 	        cmp	r0, #1	
                 bne     Left	
-                mov     r1,     #10
+                mov     r1,     #16
                 mov     r2,     JUMP
                 bl      MoveMarioLR
 Left:           mov     r0, BUTTON
@@ -66,7 +64,7 @@ Left:           mov     r0, BUTTON
                 bl      checkButton
                 cmp     r0,     #1
                 bne     Jump
-                mov     r1,     #-10
+                mov     r1,     #-16
                 mov     r2,     JUMP
                 bl      MoveMarioLR
 
@@ -98,9 +96,26 @@ GameOverLoop:
                 b       GameOverLoop
 
 
+//====================================================
+MarioPrint:     
+                push    {r4 - r6, lr}
 
-
+                mov     r6,     r1
+                mov     r1,     #0b00001
+                bl      Grab
+                mov     r5,     r0
+                ldr	r0,     [r5], #4        // initial x
+	        ldr	r1,     [r5], #20	// initial y
+	        ldr	r2,     [r5], #4 	// final x
+	        ldr	r3,     [r5]	        // final
+                bl      displayConvert
+                cmp     r0,     #-1
+                beq     EndMarioPrint
+	        mov     r4,     r6
+	        bl	CreateImage
                 
+EndMarioPrint:  
+                pop     {r4 - r6, pc}   
 
 //====================================================
 //Draws over objects when the screen is moved
@@ -108,7 +123,8 @@ GameOverLoop:
 PrintScreenMove:
                 push    {r3 - r10,    lr}
                 mov     r4,     #1
-POSCREEN:       add     r4,     #1
+POSCREEN:       
+                add     r4,     #1
                 cmp      r4,    #10
                 bge     EndPOSCREEN
                 mov     r10,     r1
@@ -123,12 +139,11 @@ POSCREEN:       add     r4,     #1
                 bl displayConvert
                 cmp     r0,     #-1
                 beq     POSCREEN
-                ldr     r4,     =blank
+                ldr     r4,     =sky
                 bl      CreateImage
                 b       POSCREEN
 
-EndPOSCREEN:      pop     {r3 - r10,    lr}
-                bx      lr   
+EndPOSCREEN:      pop     {r3 - r10,    pc} 
 
 
 
@@ -136,10 +151,11 @@ EndPOSCREEN:      pop     {r3 - r10,    lr}
 
 //====================================================
 //Draws objects that are on the screen other than mario
-PrintObjects:   push    {r3 - r10,    lr}
-                mov     r10,     #1
-POLoop:         add     r10,     #1
-                cmp      r10,    #10
+PrintObjects:   push    {r4 - r10, lr}
+                mov     r10,     #0b00001
+POLoop:         
+                add     r10,     r10,   #0b00001
+                cmp      r10,    #0b01010
                 bge     EndPOLoop
                 mov     r1,     r10
                 bl      Grab
@@ -149,14 +165,16 @@ POLoop:         add     r10,     #1
 	        ldr	r2,     [r5], #4 	// final x
 	        ldr	r3,     [r5]	        // final y
 
+                bl      displayConvert
+                cmp     r0,     #-1
+                beq     POLoop
+
                 mov     r6,     r0
                 mov     r7,     r1
                 mov     r8,     r2
                 mov     r9,     r3
-                bl      displayConvert
-                cmp     r0,     #-1
-                beq     POLoop
-                mov     r1      r10
+
+                mov     r1,     r10
                 bl      GrabImage
                 mov     r4,     r0
                 mov     r0,     r6
@@ -164,37 +182,16 @@ POLoop:         add     r10,     #1
                 mov     r2,     r8
                 mov     r3,     r9
                 bl      CreateImage
+                b       POLoop
                 
 
-EndPOLoop:      pop     {r3 - r10,    lr}
-                bx      lr    
+EndPOLoop:                    pop     {r4 - r10, pc} 
         
-
-
-
-
-
-//====================================================
-//Takes in one argument, that is which mario type to print.
-MarioPrint:    push    {r3 - r10,    lr}
-                mov     r10,     r1
-                mov     r1,     #0b00001
-                bl      Grab
-                mov     r5,     r0
-                ldr	r0,     [r5], #4        // initial x
-	        ldr	r1,     [r5], #20	// initial y
-	        ldr	r2,     [r5], #4 	// final x
-	        ldr	r3,     [r5]	        // final y
-                //bl      displayConvert
-	        mov     r4,     r10
-	        bl	CreateImage
-                
-EndMarioPrint:  pop     {r3 - r10,    lr}
-                bx      lr
 
 //====================================================
 //Prints sky over mario
-EraseMario:     push    {r3 - r10,    lr}
+EraseMario:     
+                push    {r4 - r10, lr}
                 mov     r1,     #0b00001
                 bl      Grab
                 mov     r5,     r0
@@ -203,11 +200,11 @@ EraseMario:     push    {r3 - r10,    lr}
 	        ldr	r2,     [r5], #4 	// final x
 	        ldr	r3,     [r5]	        // final y
                 bl      displayConvert
-	        ldr     r4,     =blank
+	        ldr     r4,     =sky
 	        bl	CreateImage
                 
-EndEraseMario:  pop     {r3 - r10,    lr}
-                bx      lr
+EndEraseMario:  
+                pop     {r4 - r10, pc}
 //===================================================
 Wait:
                 push    {r3 - r10,    lr}
@@ -219,8 +216,7 @@ Checktime:      ldr     r2,     [r0]                    //loop that decides if t
                 cmp     r1,     r2
                 bhi     Checktime
 
-                pop     {r3 - r10,    lr}
-                bx      lr
+                pop     {r3 - r10, pc}
 //===================================================
 //Takes in the direction to move in r1
 //Needs to take in if jump is true or not in r2 NOT DONE
@@ -258,7 +254,8 @@ MoveMarioLR:
                 b       EndMoveMarioLR
                 
 
-nocol1:         bl      EraseMario
+nocol1:         
+                bl      EraseMario
                 mov     r1,     #0b00001
                 bl      Grab
                 mov     r5,     r0
@@ -281,17 +278,21 @@ nocol1:         bl      EraseMario
                 blt    JumpLeft1
                 ldr     r4,     =MarioJumpLeftImg
                 b       MoveMario1
-JumpLeft1:      ldr     r4,     =MarioJumpRightImg
+JumpLeft1:      
+                ldr     r4,     =MarioJumpRightImg
                 b       MoveMario1       
                 
 
                 //if not jumping, decide which way to face
-NoJump1:        cmp     r7,     #0
+NoJump1:        
+                cmp     r7,     #0
                 blt     WalkLeft1
                 ldr     r4,     =MarioWalkRImg
                 b       MoveMario1
-WalkLeft1:      ldr     r4,     =MarioWalkLImg
-MoveMario1:     bl      MarioPrint
+WalkLeft1:      
+                ldr     r4,     =MarioWalkLImg
+MoveMario1:     
+                bl      MarioPrint
 
 
 //Print mario standing now
@@ -322,7 +323,8 @@ MoveMario1:     bl      MarioPrint
                 bl      CollisionHandler
                 b       EndMoveMarioLR
 
-nocol2:         bl      EraseMario
+nocol2:         
+                bl      EraseMario
                 mov     r1,     #0b00001
                 bl      Grab
                 mov     r5,     r0
@@ -340,8 +342,6 @@ nocol2:         bl      EraseMario
                 str     r3,     [r5],   #8
                 bl      displayConvert
 
-EndMoveMarioLR:
-
 
                 cmp     r8,     #0
                 beq     NoJump1
@@ -349,18 +349,22 @@ EndMoveMarioLR:
                 blt    JumpLeft2
                 ldr     r4,     =MarioJumpLeftImg
                 b       MoveMario2
-JumpLeft2:      ldr     r4,     =MarioJumpRightImg
+JumpLeft2:      
+                ldr     r4,     =MarioJumpRightImg
                 b       MoveMario2       
                 //if not jumping, decide which way to face
-NoJump2:        cmp     r7,     #0
+NoJump2:        
+                cmp     r7,     #0
                 blt     WalkLeft2
-EndMoveMarioLR: ldr     r4,     =MarioWalkRImg
+EndMoveMarioLR: 
+                ldr     r4,     =MarioWalkRImg
                 b       MoveMario2
-WalkLeft2:      ldr     r4,     =MarioWalkLImg
-MoveMario2:     bl      MarioPrint
+WalkLeft2:      
+                ldr     r4,     =MarioWalkLImg
+MoveMario2:     
+                bl      MarioPrint
 
-                pop     {r3 - r10,    lr}
-                bx      lr
+                pop     {r3 - r10, pc}
 //===================================================
 //Marios movement value in r1
 //Object collided with in r2
@@ -378,8 +382,7 @@ CollisionHandler:
 
 
 
-                pop     {r3 - r10,    lr}
-                bx      lr
+                pop     {r3 - r10, pc}
 
 
 
@@ -421,7 +424,8 @@ MarioJump:
                 mov     r0,     #-1
                 b       EndJump
 
-JumpNoCol:      mov     r1,     #0b00001
+JumpNoCol:      
+                mov     r1,     #0b00001
                 bl      Grab
                 mov     r5,     r0
                 add     r5,     #4
@@ -432,11 +436,11 @@ JumpNoCol:      mov     r1,     #0b00001
                 str     r8,     [r5],   #8
                 str     r8,     [r5]
                 
-EndJump:        ldr     r1,     =MarioJumpRightImg
+EndJump:        
+                ldr     r1,     =MarioJumpRightImg
                 bl      MarioPrint
 
-                pop     {r3 - r10,    lr}
-                bx      lr
+                pop     {r3 - r10, pc}
 
 
 //===================================================
@@ -451,7 +455,9 @@ MarioFall:
 //===================================================
 //Takes in no arguments, Determines if Mario has reached the end of the stage. If not, it does not need 
 //to return anything, but if he has reached the end then the game can print a win screen.
-WinCond:        push    {r3 - r10,    lr}
+//NOT DONE NEED TO PRINT BLANK PAGE
+WinCond:        
+                push    {r3 - r10,    lr}
 
                 mov     r1,     #1
                 bl      Grab
@@ -459,22 +465,18 @@ WinCond:        push    {r3 - r10,    lr}
                 ldr     r2,     =2772
                 cmp     r1,     r2
                 blt     EndWinCond
-                mov	r0, #0		// initial x
-	        mov	r1, #0		// initial y
-	        ldr	r2, =1023	// final x
-	        ldr	r3, =767	// final y
-	        ldr	r4, =GameWonImg
-	        bl	CreateImage
+                bl      PrintGameScreen
                 b       GameOverLoop
 
-EndWinCond:     pop     {r3 - r10,    lr}
-                bx      lr
+EndWinCond:     
+                pop     {r3 - r10, pc}
 
 //===================================================
 //Takes in no parameters, detects if Mario has moved to close to the edge
 //of the screen, and if so slides the screen by the same value that mario
 //moves, which is hard coded to 20 at the moment. Gives no return type.
-SlideScreen:    push    {r3 - r10,    lr}
+SlideScreen:    
+                push    {r3 - r10,    lr}
                 
                 mov     r1,     #1
                 bl      Grab    
@@ -495,7 +497,8 @@ SlideScreen:    push    {r3 - r10,    lr}
                 bgt     SlideRight
                 b       EndSlide
 
-SlideLeft:      ldr     r4,     [r8]
+SlideLeft:      
+                ldr     r4,     [r8]
                 ldr     r3,     [r8, #4]
 
                 mov     r6,     #0
@@ -513,7 +516,8 @@ SlideLeft:      ldr     r4,     [r8]
                 str     r3,     [r8]
                 b       RePrintOb
 
-SlideRight:     bl      PrintScreenMove
+SlideRight:     
+                bl      PrintScreenMove
                 ldr     r4,     [r8] 
                 add     r4,     r4,     #20
                 str     r4,     [r8]
@@ -522,28 +526,25 @@ SlideRight:     bl      PrintScreenMove
                 add     r4,     r4,     #20
                 str     r4,     [r8]
 
-RePrintOb:      bl      PrintObjects
+RePrintOb:      
+                bl      PrintObjects
 
-EndSlide:       pop     {r3 - r10,    lr}
-                bx      lr
+EndSlide:       
+                pop     {r3 - r10, pc}
 //===================================================
 //Check for life loss, Checks if the game is over due to loss of lives
 //Jumps to end of game if lives equals zero
-LifeLoss:       push    {r3 - r10,    lr}
+LifeLoss:       
+                push    {r3 - r10,    lr}
 
                 ldr     r0,     =Life
                 cmp     r0,     #0
                 bgt     LifeLossEnd
-                mov	r0, #0		// initial x
-	        mov	r1, #0		// initial y
-	        ldr	r2, =1023	// final x
-	        ldr	r3, =767	// final y
-	        ldr	r4, =GameOverImg
-	        bl	CreateImage
+                bl      PrintGameScreen
                 b       GameOverLoop
                 
-LifeLossEnd:    pop     {r3 - r10,    lr}
-                bx      lr
+LifeLossEnd:    
+                pop     {r3 - r10, pc}
 
 //===================================================
 //Pause Menu
@@ -554,17 +555,18 @@ LifeLossEnd:    pop     {r3 - r10,    lr}
 //Takes in no inputs, Gives no output, when score is changed, this method 
 //should be called to update the screen
 //NOT DONE - James
-ScorePrinter:   push    {r2 - r10, lr}
+ScorePrinter:   
+                push    {r2 - r10, lr}
 
-                pop     {r2 - r10, lr}
-                bx      lr
+                pop     {r2 - r10, pc}
 
 
 
 //===================================================
 //No Input no returns
 //Initialize Score and Life and coins
-InitializeScore:        push    {r2 - r10, lr}
+InitializeScore:        
+                        push    {r2 - r4, lr}
 
                         ldr     r0,     =Life
                         mov     r1,     #3
@@ -574,10 +576,68 @@ InitializeScore:        push    {r2 - r10, lr}
                         str     r1,     [r0]
                         bl      ScorePrinter
 
-                        pop     {r2 - r10,      lr}
-                        bx      lr
+                pop     {r2 - r4, pc}
 //===================================================
-.data
+//Goomba logic
+//NOT DONE
+//===================================================
+PrintGameScreen:        
+                        push    {r2 - r10, lr}
+                        ldr     r5,     =1023
+                        ldr     r10,    =736
+                        mov     r6,      #0     //x1
+                        mov     r7,      #0     //y1
+                        mov     r8,      #31    //x2
+                        mov     r9,     #31     //y2  
+      
+GSLoop:                 
+                        mov     r0,     r6
+                        mov     r1,     r7
+                        mov     r2,     r8
+                        mov     r3,     r9
+                        ldr     r4,     =sky
+                        bl      CreateImage
+                        add     r6,     #32
+                        add     r8,     #32
+                        cmp     r8,     r5
+                        ble     GSLoop
+                        add     r7,     #31
+                        add     r9,     #31
+                        mov     r6,     #0
+                        mov     r8,     #31
+                        cmp     r9,     r10
+                        ble     GSLoop
+
+                        ldr     r10,    =767
+GSLoop1:                
+                        mov     r0,     r6
+                        mov     r1,     r7
+                        mov     r2,     r8
+                        mov     r3,     r9
+                        ldr     r4,     =ground
+                        bl      CreateImage
+                        add     r6,     #32
+                        add     r8,     #32
+                        cmp     r8,     r5
+                        ble     GSLoop1
+                        add     r7,     #31
+                        add     r9,     #31
+                        mov     r6,     #0
+                        mov     r8,     #31
+                        cmp     r9,     r10
+                        ble     GSLoop1
+
+
+                pop     {r2 - r10, pc}
+                        
+
+	.unreq	BUTTON
+	.unreq	JUMP
+	.unreq	JUMPX
+	.unreq	JUMPBASE
+
+//===================================================
+.section .data
 
 Life:   .int            0
 Score:  .int            0
