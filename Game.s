@@ -2,6 +2,7 @@
 
         .section .text
         .global BeginGame
+        .global PrintGameScreen
 
 	.equ	SEL, 0b110111111111
 	.equ	START, 0b111011111111
@@ -16,18 +17,14 @@ BeginGame:
                 JUMP    .req r7         // detects if jump is over. 1 is jump 0 is no jump
                 JUMPBASE .req r8         //if a jump is initiated the base value of mario's top left corner is saved
                 JUMPX   .req r9         //Time counter for the jump equation
-
-
-test:
                 bl      PrintGameScreen
-                bl      InitializeScore
+                bl      InitializeScore             //UP TO HERE WORKS
+
                 ldr     r1,     =MarioStandRImg
                 bl      MarioPrint
-
-Test2:
+                b       GameOverLoop
         
-                bl      PrintObjects             //UP TO HERE WORKS
-Test3:
+                bl      PrintObjects
 
 GameLoop:       bl      WinCond
                 bl      SlideScreen
@@ -584,51 +581,57 @@ InitializeScore:
 PrintGameScreen:        
                         push    {r2 - r10, lr}
                         ldr     r5,     =1023
-                        ldr     r10,    =736
+                        ldr     r10,    =703
                         mov     r6,      #0     //x1
                         mov     r7,      #0     //y1
                         mov     r8,      #31    //x2
                         mov     r9,     #31     //y2  
       
-GSLoop:                 
+GSLoop1:                cmp     r8,     r5
+                        bgt     GSLoop2
                         mov     r0,     r6
                         mov     r1,     r7
                         mov     r2,     r8
                         mov     r3,     r9
                         ldr     r4,     =sky
                         bl      CreateImage
-                        add     r6,     #32
-                        add     r8,     #32
-                        cmp     r8,     r5
-                        ble     GSLoop
+                        add     r6,     #31
+                        add     r8,     #31
+                        b       GSLoop1
+
+
+GSLoop2:                cmp     r9,     r10
+                        bge     TempGS
                         add     r7,     #31
                         add     r9,     #31
                         mov     r6,     #0
                         mov     r8,     #31
-                        cmp     r9,     r10
-                        ble     GSLoop
+                        b       GSLoop1
 
+TempGS:
                         ldr     r10,    =767
-GSLoop1:                
+GSLoop3:                cmp     r8,     r5
+                        bgt     GSLoop4
                         mov     r0,     r6
                         mov     r1,     r7
                         mov     r2,     r8
                         mov     r3,     r9
                         ldr     r4,     =ground
                         bl      CreateImage
-                        add     r6,     #32
-                        add     r8,     #32
-                        cmp     r8,     r5
-                        ble     GSLoop1
+                        add     r6,     #31
+                        add     r8,     #31
+                        b       GSLoop3
+
+
+GSLoop4:                cmp     r9,     r10
+                        bge     ENDGS
                         add     r7,     #31
                         add     r9,     #31
                         mov     r6,     #0
                         mov     r8,     #31
-                        cmp     r9,     r10
-                        ble     GSLoop1
+                        b       GSLoop3
 
-
-                pop     {r2 - r10, pc}
+ENDGS:                  pop     {r2 - r10, pc}
                         
 
 	.unreq	BUTTON
