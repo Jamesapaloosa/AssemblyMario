@@ -61,7 +61,25 @@ init_Objects:   push    {r0 - r10, lr}
                 ldr     r1,     =931
                 str     r1,     [r0], #4
                 ldr     r1,     =713
-            
+                str     r1,     [r0], #4
+
+                //Initialize Bill
+                ldr     r0,     =Bill_loc
+                ldr     r1,     =2772
+                str     r1,     [r0], #4
+                ldr     r1,     =155
+                str     r1,     [r0], #4
+                ldr     r1,     =2803
+                str     r1,     [r0], #4
+                ldr     r1,     =155
+                str     r1,     [r0], #4
+                ldr     r1,     =2772
+                str     r1,     [r0], #4
+                ldr     r1,     =186
+                str     r1,     [r0], #4
+                ldr     r1,     =2803
+                str     r1,     [r0], #4
+                ldr     r1,     =186
                 str     r1,     [r0], #4
 
                 //Initialize Screen
@@ -84,7 +102,9 @@ init_Objects:   push    {r0 - r10, lr}
 //Unbreakable Box3 00110
 //Unbreakable Box4 00111
 //Pipe 01000
-//Hole 01001
+//Bill  01001
+//Hole1 01010
+//Hole2 01011
 
 
 
@@ -122,12 +142,16 @@ Grab:           push    {r2 - r10, lr}
                 cmp     r1,     #0b01000
 
                 beq     endGrab
-                ldr     r0,     =Hole_loc1
+                ldr     r0,     =Bill_loc
                 cmp     r1,     #0b01001
 
                 beq     endGrab
-                ldr     r0,     =Hole_loc2
+                ldr     r0,     =Hole_loc1
                 cmp     r1,     #0b01010
+
+                beq     endGrab
+                ldr     r0,     =Hole_loc2
+                cmp     r1,     #0b01011
 
                 beq     endGrab
                 mov     r0,     #-1
@@ -164,12 +188,16 @@ GrabImage:      push    {r2 - r10, lr}
                 cmp     r1,     #0b01000
 
                 beq     endGrab
-                ldr     r0,     =sky
+                ldr     r0,     =bullet
                 cmp     r1,     #0b01001
 
                 beq     endGrab
                 ldr     r0,     =sky
                 cmp     r1,     #0b01010
+
+                beq     endGrab
+                ldr     r0,     =sky
+                cmp     r1,     #0b01011
 
                 beq     endGrab
                 mov     r0,     #-1

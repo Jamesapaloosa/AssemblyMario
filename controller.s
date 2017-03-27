@@ -12,6 +12,7 @@
 
 getInput:
 	push	{r4-r10, lr}
+
 //	mov	SAVED_BUTTONS, r5	// save the current state of the buttons
 pressLoop:	
 	bl	Read_SNES		// Begin reading controller input

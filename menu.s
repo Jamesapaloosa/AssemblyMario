@@ -87,6 +87,7 @@ menuloop:
 
 Selection:      cmp     FLAG,   #1
                 bl      BeginGame
+                
 
 menuexit:
 	mov	r0, FLAG

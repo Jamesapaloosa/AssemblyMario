@@ -2,7 +2,7 @@
 
 .globl score
 
-128*32
+//128*32
 
 
 score:
