@@ -21,9 +21,9 @@ startMenu:
 	bl	CreateImage
 
 	ldr	r0, =328	// initial x
-	ldr	r1, =379	// initial y
+	ldr	r1, =479	// initial y
 	ldr	r2, =359	// final x
-	ldr	r3, =411	// final y
+	ldr	r3, =511	// final y
 	ldreq	r4, =mushroom
 	bleq	CreateImage
 
@@ -47,16 +47,16 @@ menuloop:
 	moveq	FLAG, #1	// if so, selection is moved to 'start game'
 
 	ldr	r0, =328	// initial x
-	ldr	r1, =479	// initial y
+	ldr	r1, =579	// initial y
 	ldr	r2, =359	// final x
-	ldr	r3, =511	// final y
+	ldr	r3, =611	// final y
 	ldreq	r4, =sky
 	bleq	CreateImage
 
 	ldr	r0, =328	// initial x
-	ldr	r1, =379	// initial y
+	ldr	r1, =479	// initial y
 	ldr	r2, =359	// final x
-	ldr	r3, =411	// final y
+	ldr	r3, =511	// final y
 	ldreq	r4, =mushroom
 	bleq	CreateImage
 	
@@ -69,16 +69,16 @@ menuloop:
 	moveq	FLAG, #0	// if so, selection is moved to 'quit game'
 
 	ldr	r0, =328	// initial x
-	ldr	r1, =379	// initial y
+	ldr	r1, =479	// initial y
 	ldr	r2, =359	// final x
-	ldr	r3, =411	// final y
+	ldr	r3, =511	// final y
 	ldreq	r4, =sky
 	bleq	CreateImage
 
 	ldr	r0, =328	// initial x
-	ldr	r1, =479	// initial y
+	ldr	r1, =579	// initial y
 	ldr	r2, =359	// final x
-	ldr	r3, =511	// final y
+	ldr	r3, =611	// final y
 	ldreq	r4, =mushroom
 	bleq	CreateImage
 	

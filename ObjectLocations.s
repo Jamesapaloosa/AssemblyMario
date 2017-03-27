@@ -46,21 +46,21 @@ init_Objects:   push    {r0 - r10, lr}
 
                 //Initialize goomba
                 ldr     r0,     =Goomba_loc
-                ldr     r1,     =2622
+                ldr     r1,     =900
                 str     r1,     [r0], #4
-                ldr     r1,     =704
+                ldr     r1,     =681
                 str     r1,     [r0], #4
-                ldr     r1,     =2653
+                ldr     r1,     =931
                 str     r1,     [r0], #4
-                ldr     r1,     =704
+                ldr     r1,     =681
                 str     r1,     [r0], #4
-                ldr     r1,     =2622
+                ldr     r1,     =900
                 str     r1,     [r0], #4
-                ldr     r1,     =736
+                ldr     r1,     =713
                 str     r1,     [r0], #4
-                ldr     r1,     =2653
+                ldr     r1,     =931
                 str     r1,     [r0], #4
-                ldr     r1,     =736
+                ldr     r1,     =713
             
                 str     r1,     [r0], #4
 
@@ -83,7 +83,6 @@ init_Objects:   push    {r0 - r10, lr}
 //Unbreakable Box2 00101
 //Unbreakable Box3 00110
 //Unbreakable Box4 00111
-//BulletBill 01000
 //Pipe 01000
 //Hole 01001
 
@@ -123,8 +122,12 @@ Grab:           push    {r2 - r10, lr}
                 cmp     r1,     #0b01000
 
                 beq     endGrab
-                ldr     r0,     =Hole_loc
+                ldr     r0,     =Hole_loc1
                 cmp     r1,     #0b01001
+
+                beq     endGrab
+                ldr     r0,     =Hole_loc2
+                cmp     r1,     #0b01010
 
                 beq     endGrab
                 mov     r0,     #-1
@@ -157,12 +160,16 @@ GrabImage:      push    {r2 - r10, lr}
                 cmp     r1,     #0b00111
 
                 beq     endGrab
-                ldr     r0,     =pipe2
+                ldr     r0,     =pipe1
                 cmp     r1,     #0b01000
 
                 beq     endGrab
                 ldr     r0,     =sky
                 cmp     r1,     #0b01001
+
+                beq     endGrab
+                ldr     r0,     =sky
+                cmp     r1,     #0b01010
 
                 beq     endGrab
                 mov     r0,     #-1
@@ -270,13 +277,13 @@ BrickBox3_loc:  .int    2298
 BrickBox4_loc:  .int    2248
                 .int    576
                 
-                .int    2279
+                .int    2278
                 .int    576
         
                 .int    2248
                 .int    608
 
-                .int    2279
+                .int    2278
                 .int    608
 
 Pipe_loc:       .int    1224
@@ -291,17 +298,29 @@ Pipe_loc:       .int    1224
                 .int    1255
                 .int    736
 
-Hole_loc:       .int    1624
-                .int    736
+Hole_loc1:      .int    1183
+                .int    713
                 
-                .int    1814
-                .int    736
+                .int    1214
+                .int    713
         
-                .int    1624
-                .int    768
+                .int    1183
+                .int    744
 
-                .int    1814
-                .int    768
+                .int    1214
+                .int    744
+
+Hole_loc2:      .int    1183
+                .int    744
+                
+                .int    1214
+                .int    744
+        
+                .int    1183
+                .int    775
+
+                .int    1214
+                .int    775
 
 Bill_loc:       .int    1624
                 .int    736

@@ -17,11 +17,11 @@ mainmenu:
 	mov	r4, r0
 	cmp	r4, #1
 
-	mov	r0, #0		// initial x
-	mov	r1, #0		// initial y
-	ldr	r2, =300	// final x
-	ldr	r3, =300	// final y
-	ldr	r4, =lose_pic
+              ldr	r0, =337		// initial x
+	        ldr	r1, =299		// initial y
+	        ldr	r2, =689	// final x
+	        ldr	r3, =379	// final y
+	        ldr	r4, =lose_img
 	bleq	CreateImage
 	blne	clearScreen
     
