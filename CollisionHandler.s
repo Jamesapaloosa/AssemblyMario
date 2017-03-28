@@ -27,9 +27,21 @@ CollisionHandler:
 		
 		cmp	r2, #0b01000
 		beq	pipeHandler
-		
+
 		cmp	r2, #0b01001
-		beq	holeHandler
+		beq	goombaHandler
+		cmp	r2, #0b01010
+		beq	questionBlockHandler
+		cmp	r2, #0b01011
+		beq	questionBlockHandler
+
+                cmp     r2,     #0b01011
+                beq     ValueHandler
+
+
+ValueHandler:           mov     r2,     #5
+                        b       incCoin
+
 //=============================================================		
 goombaHandler:
 
@@ -107,39 +119,7 @@ questionBlockHandler:
 
 	cmp r8, r10
 	bge exit		//to the BR point of mario, if >= then do nothing.
-	
-destroyQuesBlock:
-
-	mov r1, #0b00011
-	bl Grab
-        mov     r11,    r0
-	
-	ldr r0, [r11], #4
-	ldr r1, [r11], #20
-	ldr r2, [r11], #4
-	ldr r3, [r11]
-	
-	ldr r4, =sky
-	bl CreateImage		//draw blank over the question block
-	
-	mov r1, #0b00011
-	bl Grab
-        mov     r11,    r0
-	
-	ldr     r0,     =5000
-	mov r1, #50
-	ldr     r2,     =5031
-	mov r3, #19
-	
-	str r0, [r11], #4
-	str r0, [r11], #4
-	str r3, [r11], #4
-	str r0, [r11], #4
-	str r0, [r11], #4
-	str r3, [r11], #4
-	str r3, [r11], #4
-	str r3, [r11], #4
-
+        mov     r2,     #1
 	b incCoin
  //=============================================================
 
@@ -163,7 +143,7 @@ woodenBlockHandler:
 	
 destroyWoodBlock:
 	mov r5, r4
-	mov r1, r5
+	mov r1, r2
 	bl Grab
         mov     r11,    r0
 	
@@ -269,37 +249,17 @@ ldr r0, =Score
 	ldr r1, [r0]
 	add r1, r1, #1
 	str r1, [r0]
+        bl      ScorePrinter
         b       exit
 	
 incCoin:
 	ldr r0, =Coins
 	ldr r1, [r0]
-	add r1, r1, #1
+	add r1, r1, r2
 	str r1, [r0]
+        bl      ScorePrinter
         b       exit
 //=============================================================
-/*
-negateMove:
-	mov r1, #0b00001
-	bl Grab
-	
-	ldr r6, [r0]
-	ldr r7, [r0, #4]
-	ldr r8, [r0, #24]
-	ldr r9, [r0, #28]
-	
-	mov r1, #0b00000
-	bl Grab
-	
-	str r6, [r0], #4
-	str r7, [r0], #4
-	str r8, [r0], #4
-	str r7, [r0], #4
-	str r6, [r0], #4
-	str r9, [r0], #4
-	str r8, [r0], #4
-	str r9, [r0], #4
-*/	
 exit:
 		pop     {r4,    r10,    lr}
       bx      lr

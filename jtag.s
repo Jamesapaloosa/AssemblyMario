@@ -1,3 +1,11 @@
+/*
+	Filename:	main.s
+	Author:	Dmitry	Zavyalov
+	Date:	05/19/2013
+	Description:	Select	correct	GPIO	ALT	functions	to	enable	JTAG	and	loop	forever
+	Platform:	BCM2835	on	Raspberry	PI	2.0
+	Reference:	http://www.raspberrypi.org/wp-content/uploads/2012/02/BCM2835-ARM-Peripherals.pdf
+*/
 
 //	define	some	hardware	registers	necessary
 .equ	GPFSEL0,	0x3F200000	//	GPIO	Function	Select	0

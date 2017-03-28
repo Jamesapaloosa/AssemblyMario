@@ -1,12 +1,17 @@
 //Game Starts here
 
         .section .text
-        .global BeginGame
-        .global PrintGameScreen
-        .global Life
-        .global Score
-        .global Coins
-        .global NewLife
+        .globl BeginGame
+        .globl PrintGameScreen
+        .globl Life
+        .globl Score
+        .globl Coins
+        .globl NewLife
+        .globl ScorePrinter
+        .globl InitializeValuePack
+        .globl MarioPrint
+        .globl PrintObjects
+        .globl Resume
 
 	.equ	SEL, 0b110111111111
 	.equ	START, 0b111011111111
@@ -15,8 +20,8 @@
 	.equ	LEFT, 0b111111011111
 	.equ	RIGHT, 0b111111101111
 	.equ	A, 0b111111110111
-BeginGame:
-                bl      init_Objects	        
+BeginGame:      
+                bl      Init_Boxes        
                 BUTTON  .req r6		// contains the button pressed
                 JUMP    .req r7         // detects if jump is over. 1 is jump 0 is no jump
                 JUMPBASE .req r8         //if a jump is initiated the base value of mario's top left corner is saved
@@ -30,7 +35,7 @@ NewLife:        bl      init_Objects
                 bl      MarioPrint
                 bl      PrintObjects
                 bl      ScorePrinter
-                mov     JUMP,   #0
+Resume:         mov     JUMP,   #0
                 mov     JUMPX,   #0
 
 
@@ -72,7 +77,7 @@ start:          mov     r0,     BUTTON
                 bl      checkButton     
                 cmp     r0,     #1
                 bne     GameLoop
-                bl      startMenu
+                bl      pauseMenu
 
                 
 
@@ -103,13 +108,12 @@ EndMarioPrint:
 
 //====================================================
 //Draws over objects when the screen is moved
-//inputs???
 PrintScreenMove:
                 push    {r3 - r10,    lr}
                 mov     r10,     #0
 POSCREEN:       
                 add     r10,     #1
-                cmp     r10,    #0b01110
+                cmp     r10,    #16
                 bge     EndPOSCREEN
                 mov     r1,     r10
                 bl      Grab
@@ -123,7 +127,7 @@ POSCREEN:
                 cmp     r0,     #-1
                 beq     POSCREEN
                 
-                cmp     r10,    #10
+                cmp     r10,    #13
                 blt     drawSky
                 ldr     r4,     =ground
                 b       PaintOver
@@ -145,7 +149,7 @@ PrintObjects:   push    {r4 - r10, lr}
                 mov     r10,     #0b00001
 POLoop:         
                 add     r10,     r10,   #0b00001
-                cmp      r10,    #0b1110
+                cmp      r10,    #17
                 bge     EndPOLoop
                 mov     r1,     r10
                 bl      Grab
@@ -195,7 +199,6 @@ EraseMario:
                 
 EndEraseMario:  
                 pop     {r4 - r10, pc}
-//===================================================
 //===================================================
 //Takes in the direction to move in r1
 //Needs to take in if jump is true or not in r2 NOT DONE
@@ -357,7 +360,7 @@ MoveMario2:
 
 
 //===================================================
-//
+//Mario Jump
 //Takes in the x value in r1 which represents time against the y value 
 //Takes in the initial height of mario's top left corner in r2
 //Returns if collision happend so that jump can end, 0 is no collision, -1 is collision
@@ -422,6 +425,7 @@ endJump:
 
 //===================================================
 //Goomba Logic
+//Goomba takes mario's location and tries to chase him but will stop at the hole
 GoombaLogic:
                 push {r3 - r10, lr}
                 mov     r1,     #2
@@ -484,6 +488,7 @@ EndGoomba:      pop     {r3 - r10, pc}
 
 //===================================================
 //Bill Logic
+//should scroll across the screen and kill mario
 BillLogic:      push    {r3 - r10, lr}
 
                 
@@ -528,34 +533,6 @@ BillLogic:      push    {r3 - r10, lr}
 	        ldr     r4,     =bullet
 	        bl	CreateImage
                 b       EndBillLogic
-
-/*
-
-                ldr	r0,     [r5]            // initial x
-                sub     r0,     r0,     #5
-                str     r0,     [r5],   #8
-                ldr     r1,     [r5]
-                sub     r1,     r1,     #5
-                str     r1,     [r5],   #8
-                ldr     r1,     [r5]
-                sub     r1,     r1,     #5
-                str     r1,     [r5],   #8
-                ldr     r1,     [r5]
-                sub     r1,     r1,     #5
-                str     r1,     [r5]
-
-                mov     r1,     #0b001001
-                bl      Grab
-                mov     r5,     r0
-                ldr	r0,     [r5]            // initial x
-	        ldr	r1,     [r5, #4]	// initial y
-	        ldr	r2,     [r5, #24] 	// final x
-	        ldr	r3,     [r5, #28]	// final    
-                bl      displayConvert
-	        ldr     r4,     =bullet
-	        bl	CreateImage
-                b       EndBillLogic
-*/
                 
 InitBill:       bl      displayConvert
                 ldr     r4,     =sky
@@ -587,9 +564,9 @@ EndBillLogic:
 //Jump is true then mario will not fall. r0 = 1 is jump true, r0 = 0 is jump is false 
 MarioFall:
                 push    {r4 - r10,    lr}
-               
-               mov r1, #0b00001
-               bl Grab
+                mov      r9,     #0
+                mov r1, #0b00001
+                bl Grab
                 mov     r5,     r0
                 ldr     r6,     [r5]
                 ldr     r7,     =1183
@@ -636,6 +613,7 @@ NotOverHole:    ldr	r0,     [r5,#4]
                bl objectCollision
                cmp r0, #0
                beq      NofallCol
+                mov     r9,     #0
                 mov     r2,     r0
                 bl      CollisionHandler
                 ldr     r1,     =MarioJumpRightImg
@@ -659,9 +637,12 @@ NofallCol:     mov r1, #0b00001
 	        str	r1,     [r5, #12]	// initial y
 	        str	r2,     [r5, #20] 	// final x
 	        str	r3,     [r5, #28]	// final
+                mov     r9,     #1
+                
 
- 					ldr     r1,     =MarioStandRImg
+ 		ldr     r1,     =MarioStandRImg
                 bl      MarioPrint
+                mov     r0,     r9
    endfall:     pop     {r4 - r10,      pc}
 
 
@@ -771,14 +752,13 @@ LifeLossEnd:
 
 //===================================================
 //Pause Menu
-//NOT DONE - Nantong
 
 //===================================================
 //Score Printer prints score, coins and lives
 //Takes in no inputs, Gives no output, when score is changed, this method 
 //should be called to update the screen
 ScorePrinter:   
-                push    {r2 - r10, lr}
+                push    {r4 - r10, lr}
 
                 ldr	r0, =31		// initial x
 	        ldr	r1, =31		// initial y
@@ -786,7 +766,8 @@ ScorePrinter:
 	        ldr	r3, =62 	// final y
 	        ldr	r4, =score
                 bl      CreateImage
-
+        
+                bl      DrawChar
                 
                 ldr	r0, =772	// initial x
 	        ldr	r1, =31		// initial y
@@ -794,7 +775,7 @@ ScorePrinter:
 	        ldr	r3, =62 	// final y
 	        ldr	r4, =life
                 bl      CreateImage
-                
+//prints the sign saying life                
       
                 ldr	r0, =899	// initial x
 	        ldr	r1, =31		// initial y
@@ -808,7 +789,7 @@ ScorePrinter:
                 mov     r7,     r1
                 mov     r8,     r2
                 mov     r9,     r3
-
+//responsible for printing the different mushrooms that represent life
 LifeLoop:       cmp     r5,     #0
                 ble     endLifeLoop
 
@@ -825,7 +806,7 @@ LifeLoop:       cmp     r5,     #0
                 add     r8,     r8,     #31
                 
                 b       LifeLoop
-                
+//begins printing the coin label 
 endLifeLoop:    ldr	r0, =31		// initial x
 	        ldr	r1, =62		// initial y
 	        ldr	r2, =94 	// final x
@@ -865,13 +846,14 @@ CoinLoop:       cmp     r5,     #0
 
 endCoinLoop:
 
-                pop     {r2 - r10, pc}
+                pop     {r4 - r10, pc}
 
 
 
 //===================================================
 //No Input no returns
-//Initialize Score and Life and coins
+//Initialize Score and Life and coins to generic values of three
+//and zero
 InitializeScore:        
                         push    {r2 - r4, lr}
 
@@ -884,9 +866,8 @@ InitializeScore:
 
                 pop     {r2 - r4, pc}
 //===================================================
-//Goomba logic
-//NOT DONE
-//===================================================
+//Prints cells of 32 by 32 with either sky or ground
+//loops through the cells and prints the sky image
 PrintGameScreen:        
                         push    {r2 - r10, lr}
                         ldr     r5,     =1023
@@ -1020,7 +1001,7 @@ noCollDetected:
 
 next:
 	add r4, r4, #0b00001		//add 1 to object code
-	cmp r4, #0b01010
+	cmp r4, #13
 	blt grabObject
 exit:   pop {r4-r12, pc}
 
@@ -1055,10 +1036,13 @@ pressLoop:
         bl      MarioJump
         b       NewJump
 
-Falling:        cmp     r10,    #1
-                beq     NewJump
+Falling: 
 
                 bl      MarioFall
+                cmp     r0,     #1
+                beq     NoJump
+                cmp     r10,    #1
+                beq     NewJump
                 b       NoJump
 
 NewJump:        cmp     r10,    #0
@@ -1088,6 +1072,7 @@ noSub:  cmp     r8,     #0
         mov     r1, r9
 	pop	{r4-r11, lr}
 	bx 	lr
+
 
 Check_Buttons:
 	push	{r4-r10, lr}
@@ -1257,18 +1242,166 @@ pulseLoop:
 
 	pop	{r4-r10, lr}
 	bx	lr
+//============================================================================
+//Initializes the value pack when it is called from the intterupt 
+//takes in a random number and places it at that coordinate
+InitializeValuePack:
+
+                push {r5, r6, lr}
+                bl      RandomNumber
+                mov     r0,     r5
+                mov     r6,     #31
+                add     r6,     r6,     r5
+                mov     r1,   #0b1100  
+                bl      Grab
+                
+                mov     r1,     r5
+                str     r1,     [r0], #4
+                ldr     r1,     =576
+                str     r1,     [r0], #4
+                mov     r1,     r6
+                str     r1,     [r0], #4
+                ldr     r1,     =576
+                str     r1,     [r0], #4
+                mov     r1,     r5
+                str     r1,     [r0], #4
+                ldr     r1,     =608
+                str     r1,     [r0], #4
+                mov     r1,     r6
+                str     r1,     [r0], #4
+                ldr     r1,     =608
+                str     r1,     [r0], #4
+
+                pop {r5, r6,  pc}
+//============================================================================
+//Obtains a random number with which to place the value pack
+RandomNumber:
+        push {lr}        
+        mov     r0,     #4
+        ldr     r0,     =0x3F003004
+        ldr     r0,     [r0]
+        
+        eor     r0,     r0,     lsr #12
+        eor     r0,     r0,     lsl #25
+        eor     r0,     r0,     lsr #27
+
+        ldr     r1,     =0x7ff
+        and     r0,     r1
+        pop {pc}
+//============================================================================
+DrawChar:
+	push	{r4-r9, lr}
+        ldr     r0,     =Score
+        cmp     r0,     #0
+        bgt     Ch1
+        mov     r9,     #'0'
+Ch1:    cmp     r0,     #1
+        bgt     Ch2
+        mov     r9,     #'1'
+Ch2:    cmp     r0,     #2
+        bgt     Ch3
+        mov     r9,     #'2'
+Ch3:    cmp     r0,     #3
+        bgt     Ch4
+        mov     r9,     #'3'
+Ch4:    cmp     r0,     #4
+        bgt     Ch5
+        mov     r9,     #'4'
+Ch5:    cmp     r0,     #5
+        bgt     Ch6
+        mov     r9,     #'5'
+Ch6:    cmp     r0,     #6
+        bgt     Ch7
+        mov     r9,     #'6'
+Ch7:    cmp     r0,     #7
+        bgt     Ch8
+        mov     r9,     #'7'
+Ch8:    cmp     r0,     #8
+        bgt     Ch9
+        mov     r9,     #'8'
+Ch9:    mov     r9,     #'9'
+
+	chAdr	.req	r4
+	px		.req	r5
+	py		.req	r6
+	row		.req	r7
+	mask	.req	r8
+
+	ldr		chAdr,	=font		// load the address of the font map
+	mov		r0,		r9	// load the character into r0
+	add		chAdr,	r0, lsl #4	// char address = font base + (char * 16)
+
+	mov		py,		#31			// init the Y coordinate (pixel coordinate)
+
+charLoop$:
+	mov		px,		#158			// init the X coordinate
+
+	mov		mask,	#0x01		// set the bitmask to 1 in the LSB
+	
+	ldrb	row,	[chAdr], #1	// load the row byte, post increment chAdr
+
+rowLoop$:
+	tst		row,	mask		// test row byte against the bitmask
+	beq		noPixel$
+
+	mov		r0,		px
+	mov		r1,		py
+	mov		r2,		#0xF800		// red
+	bl		DrawPixel			// draw red pixel at (px, py)
+
+noPixel$:
+	add		px,		#1			// increment x coordinate by 1
+	lsl		mask,	#1			// shift bitmask left by 1
+
+	tst		mask,	#0x100		// test if the bitmask has shifted 8 times (test 9th bit)
+	beq		rowLoop$
+
+	add		py,		#1			// increment y coordinate by 1
+
+	tst		chAdr,	#0xF
+	bne		charLoop$			// loop back to charLoop$, unless address evenly divisibly by 16 (ie: at the next char)
+
+	.unreq	chAdr
+	.unreq	px
+	.unreq	py
+	.unreq	row
+	.unreq	mask
+
+	pop		{r4-r9, pc}
+
+
+
+DrawPixel:
+	push	{r4}
 
 
 
 
+	offset	.req	r4
+
+	// offset = (y * 1024) + x = x + (y << 10)
+	add		offset,	r0, r1, lsl #10
+	// offset *= 2 (for 16 bits per pixel = 2 bytes per pixel)
+	lsl		offset, #1
+
+	// store the colour (half word) at framebuffer pointer + offset
+
+	ldr	r0, =FrameBufferPointer
+	ldr	r0, [r0]
+	strh	r2, [r0, offset]
+
+	pop		{r4}
+	bx	lr
 
 .section .data
 
 Life:   .int            0
 Score:  .int            0
 Coins:  .int            0
+Pause:  .int            0
 
-
+.align 4
+font:		.incbin	"font.bin"
 
 
 

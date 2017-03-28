@@ -3,6 +3,7 @@
 .globl Screen_loc
 .globl init_Objects
 .globl GrabImage
+.globl Init_Boxes
 
 
 //Initialize Mario and Goomba to gamestart locations
@@ -88,8 +89,136 @@ init_Objects:   push    {r0 - r10, lr}
                 str     r1,     [r0], #4
                 ldr     r1,     =1024
                 str     r1,     [r0]
+                pop     {r0 - r10, pc}
 
 
+Init_Boxes:
+                push    {r0 - r10, lr}
+                ldr     r0,     =Question1_loc
+                ldr     r1,     =450
+                str     r1,     [r0], #4
+                ldr     r1,     =576
+                str     r1,     [r0], #4
+                ldr     r1,     =481
+                str     r1,     [r0], #4
+                ldr     r1,     =576
+                str     r1,     [r0], #4
+                ldr     r1,     =450
+                str     r1,     [r0], #4
+                ldr     r1,     =608
+                str     r1,     [r0], #4
+                ldr     r1,     =481
+                str     r1,     [r0], #4
+                ldr     r1,     =608
+                str     r1,     [r0], #4
+
+                ldr     r0,     =Question2_loc
+                ldr     r1,     =2267
+                str     r1,     [r0], #4
+                ldr     r1,     =576
+                str     r1,     [r0], #4
+                ldr     r1,     =2298
+                str     r1,     [r0], #4
+                ldr     r1,     =576
+                str     r1,     [r0], #4
+                ldr     r1,     =2267
+                str     r1,     [r0], #4
+                ldr     r1,     =608
+                str     r1,     [r0], #4
+                ldr     r1,     =2298
+                str     r1,     [r0], #4
+                ldr     r1,     =608
+                str     r1,     [r0], #4
+
+                ldr     r0,     =Question3_loc
+                ldr     r1,     =2236
+                str     r1,     [r0], #4
+                ldr     r1,     =576
+                str     r1,     [r0], #4
+                ldr     r1,     =2267
+                str     r1,     [r0], #4
+                ldr     r1,     =576
+                str     r1,     [r0], #4
+                ldr     r1,     =2236
+                str     r1,     [r0], #4
+                ldr     r1,     =608
+                str     r1,     [r0], #4
+                ldr     r1,     =2267
+                str     r1,     [r0], #4
+                ldr     r1,     =608
+                str     r1,     [r0], #4
+
+                ldr     r0,     =BrickBox1_loc
+                ldr     r1,     =400
+                str     r1,     [r0], #4
+                ldr     r1,     =576
+                str     r1,     [r0], #4
+                ldr     r1,     =431
+                str     r1,     [r0], #4
+                ldr     r1,     =576
+                str     r1,     [r0], #4
+                ldr     r1,     =400
+                str     r1,     [r0], #4
+                ldr     r1,     =608
+                str     r1,     [r0], #4
+                ldr     r1,     =431
+                str     r1,     [r0], #4
+                ldr     r1,     =608
+                str     r1,     [r0], #4
+
+                ldr     r0,     =BrickBox2_loc
+                ldr     r1,     =500
+                str     r1,     [r0], #4
+                ldr     r1,     =576
+                str     r1,     [r0], #4
+                ldr     r1,     =531
+                str     r1,     [r0], #4
+                ldr     r1,     =576
+                str     r1,     [r0], #4
+                ldr     r1,     =500
+                str     r1,     [r0], #4
+                ldr     r1,     =608
+                str     r1,     [r0], #4
+                ldr     r1,     =531
+                str     r1,     [r0], #4
+                ldr     r1,     =608
+                str     r1,     [r0], #4
+
+                ldr     r0,     =BrickBox3_loc
+                ldr     r1,     =2298
+                str     r1,     [r0], #4
+                ldr     r1,     =576
+                str     r1,     [r0], #4
+                ldr     r1,     =2329
+                str     r1,     [r0], #4
+                ldr     r1,     =576
+                str     r1,     [r0], #4
+                ldr     r1,     =2297
+                str     r1,     [r0], #4
+                ldr     r1,     =608
+                str     r1,     [r0], #4
+                ldr     r1,     =2330
+                str     r1,     [r0], #4
+                ldr     r1,     =608
+                str     r1,     [r0], #4
+
+                ldr     r0,     =BrickBox4_loc
+                ldr     r1,     =2248
+                str     r1,     [r0], #4
+                ldr     r1,     =576
+                str     r1,     [r0], #4
+                ldr     r1,     =2278
+                str     r1,     [r0], #4
+                ldr     r1,     =576
+                str     r1,     [r0], #4
+                ldr     r1,     =2248
+                str     r1,     [r0], #4
+                ldr     r1,     =608
+                str     r1,     [r0], #4
+                ldr     r1,     =2278
+                str     r1,     [r0], #4
+                ldr     r1,     =608
+                str     r1,     [r0], #4
                 pop     {r0 - r10, pc}
 
 //Object codes are as follows:
@@ -103,8 +232,13 @@ init_Objects:   push    {r0 - r10, lr}
 //Unbreakable Box4 00111
 //Pipe 01000
 //Bill  01001
-//Hole1 01010
-//Hole2 01011
+//Question Box 01010
+//Question Box 01011
+//ValuePack 01100
+//Hole1 01101
+//Hole2 01110
+//Hole3 01111
+//Hole4 10000
 
 
 
@@ -144,22 +278,35 @@ Grab:           push    {r2 - r10, lr}
                 beq     endGrab
                 ldr     r0,     =Bill_loc
                 cmp     r1,     #0b01001
-
                 beq     endGrab
-                ldr     r0,     =Hole_loc1
+
+
+                ldr     r0,     =Question2_loc
                 cmp     r1,     #0b01010
+                beq     endGrab
+
+                ldr     r0,     =Question3_loc
+                cmp     r1,     #0b01011
+                beq     endGrab
+
+                ldr     r0,     =ValuePack_loc
+                cmp     r1,     #0b01100
+                beq     endGrab
+
+                ldr     r0,     =Hole_loc1
+                cmp     r1,     #0b01101
 
                 beq     endGrab
                 ldr     r0,     =Hole_loc2
-                cmp     r1,     #0b01011
+                cmp     r1,     #0b01110
 
                 beq     endGrab
                 ldr     r0,     =Hole_loc3
-                cmp     r1,     #0b01100
+                cmp     r1,     #0b01111
 
                 beq     endGrab
                 ldr     r0,     =Hole_loc4
-                cmp     r1,     #0b01101
+                cmp     r1,     #0b10000
 
                 beq     endGrab
                 mov     r0,     #-1
@@ -196,24 +343,38 @@ GrabImage:      push    {r2 - r10, lr}
                 cmp     r1,     #0b01000
 
                 beq     endGrab
+
                 ldr     r0,     =bullet
                 cmp     r1,     #0b01001
-
                 beq     endGrab
-                ldr     r0,     =sky
+
+                ldr     r0,     =box
                 cmp     r1,     #0b01010
-
                 beq     endGrab
-                ldr     r0,     =sky
+
+                ldr     r0,     =box
                 cmp     r1,     #0b01011
-
                 beq     endGrab
-                ldr     r0,     =sky
+
+                ldr     r0,     =ValuePack_loc
                 cmp     r1,     #0b01100
+                beq     endGrab
 
                 beq     endGrab
                 ldr     r0,     =sky
                 cmp     r1,     #0b01101
+
+                beq     endGrab
+                ldr     r0,     =sky
+                cmp     r1,     #0b01110
+
+                beq     endGrab
+                ldr     r0,     =sky
+                cmp     r1,     #0b01111
+
+                beq     endGrab
+                ldr     r0,     =sky
+                cmp     r1,     #0b10000
 
                 beq     endGrab
                 mov     r0,     #-1
@@ -279,6 +440,30 @@ Question1_loc:  .int    450
                 .int    608
         
                 .int    481
+                .int    608	
+
+Question2_loc:  .int    2267
+                .int    576
+                
+                .int    2298
+                .int    576
+        
+                .int    2267
+                .int    608
+        
+                .int    2298
+                .int    608	
+
+Question3_loc:  .int    2236
+                .int    576
+                
+                .int    2267
+                .int    576
+        
+                .int    2236
+                .int    608
+        
+                .int    2267
                 .int    608		
 
 
@@ -341,6 +526,18 @@ Pipe_loc:       .int    1274
 
                 .int    1305
                 .int    713
+
+ValuePack_loc:  .int    5000
+                .int    5000		
+                
+                .int    5031
+                .int    5000
+        
+                .int    5000
+                .int    5031
+
+                .int    5031
+                .int    5031
 
 Hole_loc1:      .int    1183
                 .int    713
@@ -409,18 +606,3 @@ Screen_loc:     .int    0
 
 Victory_line:   .int    2672
              	 .int    0
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
