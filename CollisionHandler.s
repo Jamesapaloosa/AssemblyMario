@@ -6,6 +6,7 @@
 //from the side, mario dies. If it is with a goomba from above, Mario kills the goomba, if it
 //is a collision with ground, Mario is not moved NOT DONE
 .globl CollisionHandler
+.globl killMario
 CollisionHandler:
 		push    {r4,    r10,    lr}
        
@@ -29,7 +30,7 @@ CollisionHandler:
 		
 		cmp	r2, #0b01001
 		beq	holeHandler
-		
+//=============================================================		
 goombaHandler:
 
 	mov r4, r1
@@ -41,21 +42,18 @@ goombaHandler:
 	
 	mov r2, #0b00001
 	bl Grab
-	
-	ldr r9, [r0, #24]
-	ldr r10, [r0, #28]	//load bottom right point of Mario_loc
+	ldr r9, [r0, #4]
 	
 	mov r2, #0b00000
 	bl Grab
-	
-	ldr r7, [r0, #24]
-	ldr r8, [r0, #28]	//load bottom right point of Mario_Temp
+	ldr r7, [r0, #4]
 
-	cmp r8, r10
-	bgt	killMario
+
+	cmp     r7,     r9
+	beq     killMario
 		
-	cmp r6, r8
-	bge killGoomba
+	cmp     r7,     r9
+	bgt     killGoomba
 	
 	b killMario
 	
@@ -81,44 +79,34 @@ killGoomba:
 	mov r3, #19
 	
 	str r0, [r11], #4
-	str r1, [r11], #4
-	str r2, [r11], #4
+	str r0, [r11], #4
 	str r3, [r11], #4
 	str r0, [r11], #4
-	str r1, [r11], #4
-	str r2, [r11], #4
+	str r0, [r11], #4
+	str r3, [r11], #4
+	str r3, [r11], #4
 	str r3, [r11], #4
 
 	b incScore
-
+//=============================================================
 questionBlockHandler:
 
-	mov r4, r1
-	mov r1, r2
-	bl Grab
-	ldr r11, [r0]
-	ldr r12, [r0, #4]		//load in top left point of Question Block
-	ldr r5, [r0,#24]
-	ldr r6, [r0,#28]		//load in bottom right point of Question Block
+        mov r1, r2
 	
-	mov r2, #0b00011
+	mov r1, #1
 	bl Grab
 	
 	ldr r9, [r0],	 #4
 	ldr r10, [r0]		//load top left point of Mario_loc
-	ldr r1, [r0, #24]
-	ldr r2, [r0, #28]	//load bottom right point of Mario_loc
-	
-	mov r2, #0b00000
+
+	mov r1, #0b00000
 	bl Grab
 	
 	ldr r7, [r0]
 	ldr r8, [r0,#4]	//load top left point of Mario_Temp
+
 	cmp r8, r10
-	bgt negateMove
-	
-	cmp r12, r2		//check if the TL point of the question block is greater than or equal
-	bge negateMove			//to the BR point of mario, if >= then do nothing.
+	bge exit		//to the BR point of mario, if >= then do nothing.
 	
 destroyQuesBlock:
 
@@ -144,47 +132,34 @@ destroyQuesBlock:
 	mov r3, #19
 	
 	str r0, [r11], #4
-	str r1, [r11], #4
-	str r2, [r11], #4
+	str r0, [r11], #4
 	str r3, [r11], #4
 	str r0, [r11], #4
-	str r1, [r11], #4
-	str r2, [r11], #4
+	str r0, [r11], #4
+	str r3, [r11], #4
+	str r3, [r11], #4
 	str r3, [r11], #4
 
 	b incCoin
- 
+ //=============================================================
 
 woodenBlockHandler:
-mov r1, r2
-mov r4, r2
-
-mov r4, r1
-	mov r1, r2
-	bl Grab
-	ldr r11, [r0]
-	ldr r12, [r0, #4]		//load in top left point of wood Block
-	ldr r5, [r0,#24]
-	ldr r6, [r0,#28]		//load in bottom right point of wood Block
+        mov r1, r2
 	
-	mov r2, r4
+	mov r1, #1
 	bl Grab
 	
 	ldr r9, [r0],	 #4
 	ldr r10, [r0]		//load top left point of Mario_loc
-	ldr r1, [r0, #24]
-	ldr r2, [r0, #28]	//load bottom right point of Mario_loc
-	
-	mov r2, #0b00000
+
+	mov r1, #0b00000
 	bl Grab
 	
 	ldr r7, [r0]
 	ldr r8, [r0,#4]	//load top left point of Mario_Temp
+
 	cmp r8, r10
-	bgt exit
-	
-	cmp r12, r2		//check if the TL point of the wood block is greater than or equal
-	bge exit			//to the BR point of mario, if >= then do nothing.
+	bge exit
 	
 destroyWoodBlock:
 	mov r5, r4
@@ -210,18 +185,19 @@ destroyWoodBlock:
 	mov r3, #19
 	
 	str r0, [r11], #4
-	str r1, [r11], #4
-	str r2, [r11], #4
+	str r0, [r11], #4
 	str r3, [r11], #4
 	str r0, [r11], #4
-	str r1, [r11], #4
-	str r2, [r11], #4
+	str r0, [r11], #4
+	str r3, [r11], #4
+	str r3, [r11], #4
 	str r3, [r11], #4
 
-	b negateMove
+	b exit
+//=============================================================
 pipeHandler:		//treated as an obstacle without any other function, nothing to do
-	b negateMove
-
+	b exit
+//=============================================================
 holeHandler:
 	mov r1, r2
 	bl Grab
@@ -248,7 +224,7 @@ holeHandler:
 	
 	b killMario
 	
-	
+//=============================================================	
 
 killMario:
 
@@ -293,16 +269,16 @@ ldr r0, =Score
 	ldr r1, [r0]
 	add r1, r1, #1
 	str r1, [r0]
-	b negateMove
+        b       exit
 	
 incCoin:
 	ldr r0, =Coins
 	ldr r1, [r0]
 	add r1, r1, #1
 	str r1, [r0]
-	b negateMove
-
-
+        b       exit
+//=============================================================
+/*
 negateMove:
 	mov r1, #0b00001
 	bl Grab
@@ -322,8 +298,8 @@ negateMove:
 	str r6, [r0], #4
 	str r9, [r0], #4
 	str r8, [r0], #4
-	str r9, [r0], #4		//set location of Mario_Temp to the previous location of mario
-
+	str r9, [r0], #4
+*/	
 exit:
 		pop     {r4,    r10,    lr}
       bx      lr

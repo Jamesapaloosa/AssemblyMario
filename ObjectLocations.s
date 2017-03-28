@@ -154,6 +154,14 @@ Grab:           push    {r2 - r10, lr}
                 cmp     r1,     #0b01011
 
                 beq     endGrab
+                ldr     r0,     =Hole_loc3
+                cmp     r1,     #0b01100
+
+                beq     endGrab
+                ldr     r0,     =Hole_loc4
+                cmp     r1,     #0b01101
+
+                beq     endGrab
                 mov     r0,     #-1
 
 endGrab:        pop     {r2 - r10, pc}
@@ -198,6 +206,14 @@ GrabImage:      push    {r2 - r10, lr}
                 beq     endGrab
                 ldr     r0,     =sky
                 cmp     r1,     #0b01011
+
+                beq     endGrab
+                ldr     r0,     =sky
+                cmp     r1,     #0b01100
+
+                beq     endGrab
+                ldr     r0,     =sky
+                cmp     r1,     #0b01101
 
                 beq     endGrab
                 mov     r0,     #-1
@@ -314,17 +330,17 @@ BrickBox4_loc:  .int    2248
                 .int    2278
                 .int    608
 
-Pipe_loc:       .int    1224
-                .int    672		
+Pipe_loc:       .int    1274
+                .int    681		
                 
-                .int    1255
-                .int    672
+                .int    1305
+                .int    681
         
-                .int    1224
-                .int    736
+                .int    1274
+                .int    713
 
-                .int    1255
-                .int    736
+                .int    1305
+                .int    713
 
 Hole_loc1:      .int    1183
                 .int    713
@@ -349,6 +365,31 @@ Hole_loc2:      .int    1183
 
                 .int    1214
                 .int    775
+
+Hole_loc3:      .int    1214
+                .int    713
+                
+                .int    1245
+                .int    713
+        
+                .int    1214
+                .int    744
+
+                .int    1245
+                .int    744
+
+Hole_loc4:      .int    1214
+                .int    744
+                
+                .int    1245
+                .int    744
+        
+                .int    1214
+                .int    775
+
+                .int    1245
+                .int    775
+
 
 Bill_loc:       .int    1624
                 .int    736

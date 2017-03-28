@@ -25,6 +25,7 @@ BeginGame:
 
 NewLife:        bl      init_Objects
                 bl      PrintGameScreen
+                bl      LifeLoss
                 ldr     r1,     =MarioStandRImg
                 bl      MarioPrint
                 bl      PrintObjects
@@ -108,7 +109,7 @@ PrintScreenMove:
                 mov     r10,     #0
 POSCREEN:       
                 add     r10,     #1
-                cmp     r10,    #11
+                cmp     r10,    #0b01110
                 bge     EndPOSCREEN
                 mov     r1,     r10
                 bl      Grab
@@ -144,7 +145,7 @@ PrintObjects:   push    {r4 - r10, lr}
                 mov     r10,     #0b00001
 POLoop:         
                 add     r10,     r10,   #0b00001
-                cmp      r10,    #0b01011
+                cmp      r10,    #0b1110
                 bge     EndPOLoop
                 mov     r1,     r10
                 bl      Grab
@@ -202,20 +203,23 @@ EndEraseMario:
 MoveMarioLR:
                 push    {r3 - r10,    lr}
                 mov     r7,     r1              //put the direction value in a safe place
-                mov     r1,     #0b00000
                 mov     r8,     r2              //put the jump state in a safe place
+                mov     r1,     #0b00000
                 bl      Grab
                 mov     r5,     r0
-                ldr     r0,     [r5]
+                mov     r1,     #0b00001
+                bl      Grab
+                mov     r6,     r0
+                ldr     r0,     [r6]
                 add     r0,     r0,     r7
                 str     r0,     [r5],   #8
-                ldr     r1,     [r5]
+                ldr     r1,     [r6]
                 add     r1,     r1,     r7
                 str     r1,     [r5],   #8
-                ldr     r2,     [r5]
+                ldr     r2,     [r6]
                 add     r2,     r2,     r7
                 str     r2,     [r5],   #8
-                ldr     r3,     [r5]
+                ldr     r3,     [r6]
                 add     r3,     r3,     r7
                 str     r3,     [r5],   #8
                 //check for move off of screen
@@ -275,18 +279,21 @@ MoveMario1:
                 mov     r1,     #0b00000
                 bl      Grab
                 mov     r5,     r0
-                ldr     r1,     [r5]
+                mov     r1,     #0b00001
+                bl      Grab
+                mov     r6,     r0
+                ldr     r0,     [r6]
+                add     r0,     r0,     r7
+                str     r0,     [r5],   #8
+                ldr     r1,     [r6]
                 add     r1,     r1,     r7
                 str     r1,     [r5],   #8
-                ldr     r1,     [r5]
-                add     r1,     r1,     r7
-                str     r1,     [r5],   #8
-                ldr     r1,     [r5]
-                add     r1,     r1,     r7
-                str     r1,     [r5],   #8
-                ldr     r1,     [r5]
-                add     r1,     r1,     r7
-                str     r1,     [r5],   #8
+                ldr     r2,     [r6]
+                add     r2,     r2,     r7
+                str     r2,     [r5],   #8
+                ldr     r3,     [r6]
+                add     r3,     r3,     r7
+                str     r3,     [r5],   #8
                 //check for move off of screen
                 cmp     r0,     #0
                 blt     EndMoveMarioLR
@@ -362,15 +369,18 @@ MarioJump:
                mov r1, #0b00000
                bl Grab
                 mov     r5,     r0
-                ldr	r0,     [r5,#4]            // initial x
-	        ldr	r1,     [r5, #12]	// initial y
-	        ldr	r2,     [r5, #20] 	// final x
-	        ldr	r3,     [r5, #28]	// final
+                mov     r1,     #0b00001
+                bl      Grab
+                mov     r6,     r0
+                ldr	r0,     [r6,#4]            // initial x
+	        ldr	r1,     [r6, #12]	// initial y
+	        ldr	r2,     [r6, #20] 	// final x
+	        ldr	r3,     [r6, #28]	// final
 
-                sub     r0,     #4
-                sub     r1,     #4
-                sub     r2,     #4
-                sub     r3,     #4
+                sub     r0,     #8
+                sub     r1,     #8
+                sub     r2,     #8
+                sub     r3,     #8
 
                 str	r0,     [r5,#4]            // initial x
 	        str	r1,     [r5, #12]	// initial y
@@ -380,6 +390,7 @@ MarioJump:
                bl objectCollision
                cmp r0, #0
                beq      NoJumpCol
+                mov     r2,     r0
                 bl      CollisionHandler
                 ldr     r1,     =MarioJumpRightImg
                 bl      MarioPrint
@@ -388,15 +399,17 @@ MarioJump:
 NoJumpCol:     mov r1, #0b00001
                bl Grab
                 mov     r5,     r0
+                bl      Grab
+                mov     r6,     r0
                 ldr	r0,     [r5,#4]            // initial x
 	        ldr	r1,     [r5, #12]	// initial y
 	        ldr	r2,     [r5, #20] 	// final x
 	        ldr	r3,     [r5, #28]	// final
 
-                sub     r0,     #4
-                sub     r1,     #4
-                sub     r2,     #4
-                sub     r3,     #4
+                sub     r0,     #8
+                sub     r1,     #8
+                sub     r2,     #8
+                sub     r3,     #8
 
                 str	r0,     [r5,#4]            // initial x
 	        str	r1,     [r5, #12]	// initial y
@@ -473,39 +486,76 @@ EndGoomba:      pop     {r3 - r10, pc}
 //Bill Logic
 BillLogic:      push    {r3 - r10, lr}
 
+                
+                
+                mov     r7,     #-5
+
+                mov     r1,     #0b001001
+                bl      Grab
+                mov     r5,     r0
+                ldr	r0,     [r5], #4
+                cmp     r0,     #32
+                blt     InitBill
+	        ldr	r1,     [r5], #20	// initial y
+	        ldr	r2,     [r5], #4 	// final x
+	        ldr	r3,     [r5]	        // final y
+                bl      displayConvert
+	        ldr     r4,     =sky
+	        bl	CreateImage
+                mov     r1,     #0b001001
+                bl      Grab
+                mov     r5,     r0
+                ldr     r0,     [r5]
+                add     r0,     r0,     r7
+                str     r0,     [r5],   #8
+                ldr     r1,     [r5]
+                add     r1,     r1,     r7
+                str     r1,     [r5],   #8
+                ldr     r2,     [r5]
+                add     r2,     r2,     r7
+                str     r2,     [r5],   #8
+                ldr     r3,     [r5]
+                add     r3,     r3,     r7
+                str     r3,     [r5],   #8
+                mov     r1,     #0b001001
+                bl      Grab
+                mov     r5,     r0
+                ldr	r0,     [r5], #4
+	        ldr	r1,     [r5], #20	// initial y
+	        ldr	r2,     [r5], #4 	// final x
+	        ldr	r3,     [r5]	        // final y
+                bl      displayConvert
+	        ldr     r4,     =bullet
+	        bl	CreateImage
+                b       EndBillLogic
+
+/*
+
+                ldr	r0,     [r5]            // initial x
+                sub     r0,     r0,     #5
+                str     r0,     [r5],   #8
+                ldr     r1,     [r5]
+                sub     r1,     r1,     #5
+                str     r1,     [r5],   #8
+                ldr     r1,     [r5]
+                sub     r1,     r1,     #5
+                str     r1,     [r5],   #8
+                ldr     r1,     [r5]
+                sub     r1,     r1,     #5
+                str     r1,     [r5]
+
                 mov     r1,     #0b001001
                 bl      Grab
                 mov     r5,     r0
                 ldr	r0,     [r5]            // initial x
 	        ldr	r1,     [r5, #4]	// initial y
 	        ldr	r2,     [r5, #24] 	// final x
-	        ldr	r3,     [r5, #28]	// final
-                cmp     r0,     #0
-                ble       InitBill
-
-                bl      displayConvert
-                ldr     r4,     =sky
-                bl      CreateImage
-
-                ldr	r0,     [r5]            // initial x
-	        ldr	r1,     [r5, #4]	// initial y
-	        ldr	r2,     [r5, #24] 	// final x
-	        ldr	r3,     [r5, #28]	// final
-                sub     r0,     r0,     #5
-                str     r0,     [r5]
-                sub     r2,     r2,     #5
-                str     r2,     [r5,    #24]
-                ldr     r6,     [r5,    #8]
-                sub     r6,     r6,     #5
-                str     r6,     [r5,    #8]
-                ldr     r6,     [r5,    #16]
-                sub     r6,     r6,     #5
-                str     r6,     [r5,    #16]
-
+	        ldr	r3,     [r5, #28]	// final    
                 bl      displayConvert
 	        ldr     r4,     =bullet
 	        bl	CreateImage
                 b       EndBillLogic
+*/
                 
 InitBill:       bl      displayConvert
                 ldr     r4,     =sky
@@ -537,19 +587,43 @@ EndBillLogic:
 //Jump is true then mario will not fall. r0 = 1 is jump true, r0 = 0 is jump is false 
 MarioFall:
                 push    {r4 - r10,    lr}
-               bl EraseMario
+               
                mov r1, #0b00001
                bl Grab
                 mov     r5,     r0
-                ldr	r0,     [r5,#4]            // initial x
-	        ldr	r1,     [r5, #12]	// initial y
-	        ldr	r2,     [r5, #20] 	// final x
-	        ldr	r3,     [r5, #28]	// final
+                ldr     r6,     [r5]
+                ldr     r7,     =1183
+                cmp     r6,     r7
+                bgt     CheckHole1
+                b       NotOverHole
+                
+CheckHole1:     ldr     r7,     =1245
+                ldr     r6,     [r5, #8]
+                cmp     r6,     r7
+                bge     NotOverHole
+                ldr     r6,     [r5,#4]
+                ldr     r7,     =713
+                cmp     r6,     r7
+                bge     killMario
+                bl      EraseMario
+                b       NofallCol
 
-                add     r0,     #4
-                add     r1,     #4
-                add     r2,     #4
-                add     r3,     #4
+
+
+
+NotOverHole:    ldr	r0,     [r5,#4]         
+	        ldr	r1,     [r5, #12]	
+	        ldr	r2,     [r5, #20] 	
+	        ldr r8, =713
+	        cmp r2, r8
+	        bge endfall
+	        ldr	r3,     [r5, #28]
+	        bl EraseMario
+
+                add     r0,     #8
+                add     r1,     #8
+                add     r2,     #8
+                add     r3,     #8
 
                mov r1, #0b00000
                bl Grab
@@ -562,6 +636,7 @@ MarioFall:
                bl objectCollision
                cmp r0, #0
                beq      NofallCol
+                mov     r2,     r0
                 bl      CollisionHandler
                 ldr     r1,     =MarioJumpRightImg
                 bl      MarioPrint
@@ -575,77 +650,19 @@ NofallCol:     mov r1, #0b00001
 	        ldr	r2,     [r5, #20] 	// final x
 	        ldr	r3,     [r5, #28]	// final
 
-                add     r0,     #4
-                add     r1,     #4
-                add     r2,     #4
-                add     r3,     #4
+                add     r0,     #8
+                add     r1,     #8
+                add     r2,     #8
+                add     r3,     #8
 
                 str	r0,     [r5,#4]            // initial x
 	        str	r1,     [r5, #12]	// initial y
 	        str	r2,     [r5, #20] 	// final x
 	        str	r3,     [r5, #28]	// final
-                ldr     r1,     =MarioJumpRightImg
+
+ 					ldr     r1,     =MarioStandRImg
                 bl      MarioPrint
-endfall:        pop     {r4 - r10,      pc}
-
-/*     
-                mov     r7,     #4
-
-                mov     r1,     #0b00000
-                bl      Grab
-                mov     r5,     r0
-                mov     r1,     #0b00001
-                bl      Grab
-                mov     r6,     r0
-
-                ldr     r0,     [r6, #4]
-                add     r0,     r0,     r7
-                str     r0,     [r5, #4]
-                ldr     r1,     [r6, #12]
-                add     r1,     r1,     r7
-                str     r1,     [r5, #12]
-                ldr     r2,     [r6, #20]
-                add     r2,     r2,     r7
-                str     r2,     [r5, #20]
-                ldr     r3,     [r6, #28]
-                ldr     r9,     =712
-                cmp     r9,    r3
-                blt     EndFall
-                add     r3,     r3,     r7
-                str     r3,     [r5, #28]
-
-                //Check for collision and undo movement if so
-                bl      objectCollision
-                cmp     r0,     #0
-                beq     NoFallCol
-                mov     r1,     r7
-                mov     r2,     r0
-                bl      CollisionHandler
-                b       EndFall
-NoFallCol:      
-                //check for falling below the ground
-                mov     r1,     #0b00001
-                bl      Grab
-                mov     r5,     r0
-                
-                bl      EraseMario
-                ldr     r0,     [r5, #4]
-                add     r0,     r0,     r7
-                str     r0,     [r5, #4]
-                ldr     r1,     [r5, #12]
-                add     r1,     r1,     r7
-                str     r1,     [r5, #12]
-                ldr     r2,     [r5, #20]
-                add     r2,     r2,     r7
-                str     r2,     [r5, #20]
-                ldr     r3,     [r5, #28]
-                add     r3,     r3,     r7
-                str     r3,     [r5, #28]
-EndFall:        ldr     r4,     =MarioJumpRightImg
-                bl      MarioPrint
-  */
-                pop     {r4 - r10, pc}
-
+   endfall:     pop     {r4 - r10,      pc}
 
 
 //===================================================
@@ -934,63 +951,38 @@ ENDGS:                  pop     {r2 - r10, pc}
 //===================================================
 objectCollision:
 
-push	{r4-r10,lr}
+push	{r4-r12,lr}
 
 	mov r1, #0b00000
 	//load values of mario into respective registers
 	xLeft1  	.req 	r5			//left x coordinate for first object
 	xRight1 	.req	r6			//right x coordinate for first object
 	yDown1  	.req	r7			//Down y coordinate for first object
-	yUp1		.req  r8				//up y coordinate for first object
+	yUp1		.req    r8				//up y coordinate for first object
 	bl Grab
 
 
-	ldr xLeft1, [r0], #4
-	ldr yUp1, [r0], #20
-	ldr xRight1, [r0], #4
-	ldr yDown1, [r0]
+	ldr     xLeft1,     [r0], #4
+	ldr     yUp1,       [r0], #20
+	ldr     xRight1,    [r0], #4
+	ldr     yDown1,     [r0]
 	
-	mov r1, #0b00010
-
-loadObject:
-
-	cmp r1, #0b00010
-	beq grabObject
-
-	cmp r1, #0b00011
-	beq grabObject
-
-	cmp r1, #0b00100
-	beq grabObject
-
-	cmp r1, #0b00101
-	beq grabObject
-
-	cmp r1, #0b00110
-	beq grabObject
-
-	cmp r1, #0b00111
-	beq grabObject
-
-	cmp r1, #0b01000
-	beq grabObject
-
-	cmp r1, #0b01001
+	mov r1,   #0b00010
+        mov     r4,     r1
 
 	//load values of object two into respective registers
 grabObject:
+        mov     r1,     r4
 	bl Grab
-	mov r4, r1
- 
-	xLeft2 	.req 	r9				//left x coordinate for second object
-	xRight2	.req  r10			//right x coordinate for first object
-	yDown2	.req  r11			//Down y coordinate for first object
+	xLeft2 	        .req  r9				//left x coordinate for second object
+	xRight2	        .req  r10			//right x coordinate for first object
+	yDown2	        .req  r11			//Down y coordinate for first object
 	yUp2		.req  r12			//up y coordinate for first object
 
-	ldr xLeft2, [r0], #4
-	ldr yUp2, [r0], #20
-	ldr xRight2, [r0], #4
-	ldr yDown2, [r0]
+	ldr xLeft2,     [r0], #4
+	ldr yUp2,       [r0], #20
+	ldr xRight2,    [r0], #4
+	ldr yDown2,     [r0]
 
 	mov r0, xLeft2
 	mov r1, yUp2
@@ -1021,21 +1013,16 @@ bl displayCheck
 collDetected:
 
 	mov r0, r4			//move code of object to r0 if collision is detected
-	
 	b exit				//branch to exit when collision is detected
 	
 noCollDetected:
 	mov r0, #0
 
 next:
-	add r1, r4, #0b00001		//add 1 to object code
-	cmp r1, #0b01010
-	blt loadObject
-	
-exit:
-
-	pop {r4-r10,lr}
-	bx		lr
+	add r4, r4, #0b00001		//add 1 to object code
+	cmp r4, #0b01010
+	blt grabObject
+exit:   pop {r4-r12, pc}
 
 //===============================================
 //Game controller input is from here on
@@ -1059,16 +1046,20 @@ getInputGame:
 pressLoop:	
         mov     r10,    r1
         mov     r9,    r4
-        bl      LifeLoss
         bl      WinCond
         bl      GoombaLogic
+        //bl      BillLogic
         cmp     r9,     #0
         beq     Falling
         mov     r1,     r9
         bl      MarioJump
         b       NewJump
 
-Falling:        //bl      MarioFall
+Falling:        cmp     r10,    #1
+                beq     NewJump
+
+                bl      MarioFall
+                b       NoJump
 
 NewJump:        cmp     r10,    #0
                 beq     NoJump
@@ -1078,7 +1069,6 @@ NewJump:        cmp     r10,    #0
         
 
 NoJump:	bl	Read_SNES		// Begin reading controller input
-        //bl      BillLogic
 
 	mov	r5, r0			// Store 'buttons' array
 	bl	Check_Buttons		// Check for flags
@@ -1086,16 +1076,15 @@ NoJump:	bl	Read_SNES		// Begin reading controller input
 //	cmp	SAVED_BUTTONS, r5	// checks whether buttons have changed
 //	beq	pressLoop		// if not, keep looping
 	
-	cmp	r8, #0			// checks whether anything has been pressed
+        cmp     r9,     #0
+        beq     noSub
+        sub     r9,     r9,     #1
+noSub:  cmp     r8,     #0
 //	moveq	SAVED_BUTTONS, r5	// if not, preserves unpressed state
 	beq	pressLoop		// it also keeps looping
 
 	lsr	r5, #5			// shift the unneeded four bits out (13-16)
 	mov	r0, r5			// returns buttons pressed to main
-        cmp     r9,     #0
-        beq     noSub
-        sub     r9,     r9,     #1
-noSub:
         mov     r1, r9
 	pop	{r4-r11, lr}
 	bx 	lr
